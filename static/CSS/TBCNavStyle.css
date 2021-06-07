@@ -1,0 +1,205 @@
+*{
+	margin: 0px;
+	padding: 0px;
+	box-sizing: border-box;
+}
+
+nav
+{
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	min-height: 8vh;
+	font-family: 'Poppins', sans-serif;
+	border-bottom: 2px solid black;
+	background-color:#9131B0;
+}
+
+.logo 
+{
+	color: #FFFDFC;
+	text-transform: uppercase;
+	letter-spacing: 5px;
+	font-size: 35px;
+	transition: all 0.3s ease;
+}
+
+.logo p
+{
+	font-size: 
+	20px;
+}
+
+.opcionesNav
+{
+	display: flex;
+	justify-content: space-around;
+	width: 40%;
+
+}
+
+.opcionesNav li
+{
+	list-style: none;
+
+}
+
+.opcionesNav a:hover
+{
+	color: #000000;
+}
+
+.opcionesNav a
+{
+	color: #FFFFFF;
+	text-decoration: none;
+	letter-spacing: 3px;
+	font-size: 14px;
+	transition: all 0.3s ease;
+}
+
+
+
+.menuH
+{
+	cursor: pointer;
+	display: none;
+}
+
+.menuH div
+{
+	width: 25px;
+	height: 3px;
+	background-color: #FFFFF2;
+	margin: 5px;
+	transition: all 0.3s ease;
+}
+
+@media screen and (max-width: 1024px)
+{
+	.opcionesNav
+	{
+		width: 60%;
+	}
+
+	.logo p
+{
+	font-size: 
+	17px;
+}
+
+}
+
+@media screen and (max-width: 768px)
+{
+
+	.logo p
+	{
+		font-size: 
+		15px;
+	}
+
+	body
+	{
+		overflow-x: hidden;
+	}
+	.opcionesNav
+	{
+		position: absolute;
+		right: 0px;
+		height: 92vh;
+		top: 8vh;
+		background-color: #9131B0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		width: 30%;
+		transform: translateX(100%);
+		transition: transform 0.5s ease-in;
+	}
+
+	.opcionesNav li
+	{
+		opacity: 0;
+	}
+
+	.menuH
+	{
+		display: block;
+	}
+
+
+}
+
+.nav-active
+{
+		transform: translateX(0%);
+}
+
+@keyframes aumentarLogo
+{
+	from
+	{
+		font-size: 35px;
+	}
+	to
+	{
+		font-size: 45px;
+	}
+}
+
+@keyframes desvanecerNav
+{
+	from
+	{
+	 opacity: 0;
+	 transform: translateX(50px); 
+	}
+
+	to
+	{
+	 opacity: 1;
+	 transform: translateX(0px);
+	 }
+}
+
+.toggle .lineaUno
+{
+	transform: rotate(-45deg) translate(-5px,10px);
+}
+
+.toggle .lineaDos
+{
+	opacity: 0;
+}
+
+.toggle .lineaTres
+{
+	transform: rotate(45deg) translate(-5px,-6px);
+}
+
+.logo h4
+{
+	color: #FFFDFC;
+	text-transform: uppercase;
+	letter-spacing: 5px;
+	font-size: 35px;
+	transition: all 0.3s ease;
+	font-weight: 600;
+	margin-bottom: 0px;
+}
+
+.logo h4:hover
+{
+	font-size: 45px;
+}
+
+.override ul
+{
+	margin-bottom: 0;
+}
+
+ .EstiloCarousel
+ {
+ 	border: 2px solid white;
+ }

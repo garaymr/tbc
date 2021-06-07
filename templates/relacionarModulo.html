@@ -1,0 +1,341 @@
+{% extends 'baseTBC.html'%}
+{% load static %}
+{% block content %}
+<title>Relacionar módulo</title>
+        <div class="form-row">
+            <div class="col-md-6">
+                <!--Tarjeta de filtro e info-->
+                <div class="container-flex mb-3" id="wwg-accordian">
+                    <div class="card">
+                        <div class="card-header" id="filtroInfo-heading" style="background-color: white;">      
+                            <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#filtroInfo" style="cursor:pointer;"><i class="fas fa-chalkboard-teacher"></i>&nbsp;Búsqueda de docente</h5>
+                        </div>
+                        <div class="collapse show" id="filtroInfo">
+                            <div class="card-text p-3">
+                                <div class="form-row mb-2">
+                                    <div class="col-md-5">
+                                        <select class="selectpicker" data-live-search="true" data-width="100%" data-size="4" title="Buscar docente..."  id="selectDocente" onchange="seleccionDocente();" required>
+                                            {% for doc in docente %}
+                                                <option value="{{ doc.id_docente }}">{{ doc.nombres_docente }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2 mb-2 d-flex justify-content-center align-items-center">
+                                        <i class="fas fa-exchange-alt"></i>
+                                    </div>
+                                    <div class="col-md-5 mb-2">
+                                        <select class="selectpicker" data-live-search="true" data-width="100%" data-size="4" title="Buscar módulo..."  id="selectModulo" onchange="seleccionModulo();" required>
+                                            {% for mod in modulo %}
+                                                <option value="{{ mod.id_modulo }}">{{ mod.nombre_modulo }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-12">
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            <input type="text" name="bandera" value="False" hidden required>
+                                            <input type="text" id="inputDocente" name="docente" hidden required>
+                                            <input type="text" id="inputModulo" name="modulo" hidden required>
+                                            <button class="btn btn-outline-success btn-block" type="submit">Guardar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <hr>
+                                <label for="tabla">Tabla con los módulos y su docente correspondiente</label>
+                                <table class="table table-borderless" id="listaDocentes" style="height: 299px; display: -moz-groupbox;">
+                                    <thead>
+                                      <tr style="width: 100%; display: inline-table; height:60px; table-layout: fixed;">
+                                        <th style="width: 23%;">#</th>
+                                        <th style="width: 48%;">Docente</th>
+                                        <th>Módulo</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody style="overflow-y: scroll; height: 249px; width: 95%; position: absolute;">
+                                        {% for doc in docente %}
+                                            {% for mod in modulo %}
+                                                {% for docmod in docenteModulo %}
+                                                    {% if docmod.id_curso == mod.id_modulo and docmod.id_docente == doc.id_docente %}
+                                                        <tr>
+                                                            <th style="width: 10%;" scope="row">{{ forloop.counter }}</th>
+                                                            <td style="width: 40%;">{{ doc.nombres_docente }} </td>
+                                                            <td style="width: 10%;"> <i class="fas fa-exchange-alt"></i> </td>
+                                                            <td style="width: 40%;">{{ mod.nombre_modulo }}</td>
+                                                        </tr>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Tarjeta oculta TODO:Eliminar-->
+                <div hidden class="container-flex mb-3" id="wwg-accordian">
+                    <div class="card">
+                        <div class="card-header" id="lista-heading" style="background-color: white;">      
+                            <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#lista" style="cursor:pointer;"><i class="fas fa-chalkboard-teacher"></i></i>&nbsp;Relacionar módulo a docente</h5>
+                        </div>
+                        <div class="collapse show" id="lista">
+                            <div class="card-text p-2">
+                                <form method="post" action="">
+                                    {% csrf_token %}
+                                    <table class="table table-borderless table-hover" style="height: 500px; display: -moz-groupbox;">
+                                        <thead class="">
+                                            <tr style="display: inline-table; height:60px; table-layout: fixed;">
+                                                <th scope="col" style="width: 64.38%;">Nombre</th>
+                                                <th scope="col" style="width: 19.9%;">Matrícula</th>
+                                                <th scope="col" style="width: 6.0%;">A</th>
+                                                <th scope="col" style="width: 5.13%;">R</th>
+                                                <th scope="col" style="width: 8.3%;">J</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody style="overflow-y: scroll; height: 450px; width: 96.5%; position: absolute">
+                                            {% for alS in alumnoSel %}
+                                                {% for alSM in alumnoSelM %}
+                                                    {% if alS.id_alumno == alSM.id_alumno %}
+                                                    <tr>
+                                                        <td style="width: 64.5%;">{{ alS.nombre_alumno }} <input type="text" value="{{ alS.nombre_alumno }}" hidden name="nombreAlumnoTabla"></td> <!--Nombre-->
+                                                        <td style="width: 20%;">{{ alS.num_matricula }} <input type="text" value="{{ alS.num_matricula }}" hidden name="matriculaAlumnoTabla"></td> <!--Matrícula-->
+                                                        <td style="padding-top: 0;" > &nbsp;&nbsp;&nbsp;<input type="checkbox" name="Asistencia{{forloop.counter0}}" id="asistencia"></td>
+                                                        <td  style="padding-top: 0;"  class="text-center"> &nbsp;&nbsp;&nbsp;<input type="checkbox" name="Retardo{{forloop.counter0}}" id="retardo"></td>
+                                                        <td style="padding-top: 0;"  class="text-center"> &nbsp;&nbsp;<input type="checkbox" name="Justificacion{{forloop.counter0}}" id="justificacion"></td>
+                                                        <td hidden><input type="text" name="cctL" value="{{ alS.cct }}"></td>
+                                                        <td hidden> <input type="text" name="fechaL" value=" {% now "SHORT_DATE_FORMAT" %} "> </td>
+                                                        <td hidden><input type="text" name="semestreL" value="{{ alS.semestre }}"></td>
+                                                        <td hidden><input type="text" name="id_dcL" value="{{ alSM.id_dc }}"></td>
+                                                        <td hidden><input type="text" name="id_alumnoL" value="{{ alSM.id_alumno }}"></td>
+                                                    </tr>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <input type="text" name="bandera" value="True" hidden>
+                                    <div class="form-row">
+                                        <div class="col-md-6">
+                                            <button class="btn btn-outline-primary btn-block" type="submit">Exportar</button>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <button class="btn btn-outline-success btn-block" type="submit" >Guardar</button>
+                                        </div>
+                                    </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+            <!--Columna derecha-->
+            <div class="col-md-6 mb-3">
+                <!--Tarjeta de filtro e info-->
+                <div class="container-flex mb-3" id="wwg-accordian">
+                    <div class="card">
+                        <div class="card-header" id="filtroHistorial-heading" style="background-color: white;">      
+                            <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#filtroHistorial" style="cursor:pointer;"><i class="fas fa-filter"></i>&nbsp;Búsqueda de alumnos para relacionar</h5>
+                        </div>
+                        <div class="collapse show" id="filtroHistorial">
+                            <div class="card-text p-3">
+                                <form method="post">
+                                    {% csrf_token %}
+
+                                    <label for="busqueda">Seleccione el módulo impartido por algún docente para relacionarlo</label>
+                                    <select class="selectpicker" data-live-search="true" data-width="100%" data-size="4" title="Seleccione..."  id="selectDocenteModulo" onchange="seleccionDocenteModulo();" required>
+                                        {% for doc in docente %}
+                                            {% for mod in modulo %}
+                                                {% for docmod in docenteModulo %}
+                                                    {% if docmod.id_curso == mod.id_modulo and docmod.id_docente == doc.id_docente %}
+                                                        <option value="{{ docmod.id_dc }}"> <strong>{{ mod.nombre_modulo }}</strong> -  {{ doc.nombres_docente }} </option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </select>
+                                    <input type="text" hidden id="inputDocenteModulo" name="docenteModulo">
+                                    <br><br>
+
+                                    <label for="buscar">Búsqueda sólo por semestre</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control border border-ligth rounded-left" placeholder="Search" name="buscarAlumno" id="inputAlumno" onkeyup="filtraAlumno();">
+                                        <div class="input-group-btn border border-ligth rounded-right">
+                                            <button class="btn btn-default" style="cursor: context-menu;">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <table class="table table-borderless table-hover" id="listaAlumnos" style="height: 250px; display: -moz-groupbox;">
+                                        <thead>
+                                          <tr style="width: 100%; display: inline-table; height:60px; table-layout: fixed;">
+                                            <th style="width: 30%;">#</th>
+                                            <th style="width: 95%;">Nombre</th>
+                                            <th style="width: 39%;">Matrícula</th>
+                                            <th style="width: 35%;">Semestre</th>
+                                            <th style="width: 30%;"><input type="checkbox" onclick="toggle(this)" /> Todos<br/></th>
+                                          </tr>
+                                        </thead>
+                                        <tbody style="overflow-y: scroll; height: 200px; width: 95%; position: absolute;">
+                                                {% for al in alumno %}
+                                                {% csrf_token %}
+                                                <tr>
+                                                    <th scope="row" style="width: 15%;">{{ forloop.counter }}</th>
+                                                    <td hidden>{{ al.id_alumno }} <input name="id_alumnoL" type="text" value="{{ al.id_alumno }}"> </td>
+                                                    <td style="width: 46%;">{{ al.nombre_alumno }} <input hidden name="nombreAlumnoTabla" type="text" value="{{ al.nombre_alumno }}"> </td>
+                                                    <td style="width: 20%;">{{ al.num_matricula }}</td>
+                                                    <td style="width: 20%;">{{ al.semestre }}</td>
+                                                    <td ><input type="checkbox" clas="foo" name="alumnoModulo{{forloop.counter0}}" id="alumnoModulo"></td>
+                                                </tr>
+                                                {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <input type="text" name="bandera" value="True" hidden>
+                                    <button class="btn btn-outline-success btn-block">Guardar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Tarjeta del historial TODO:Eliminar-->
+                <div hidden class="container-flex mb-3" id="wwg-accordian">
+                    <div class="card">
+                        <div class="card-header" id="historial-heading" style="background-color: white; height: 63px;">      
+                            <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#historial" style="cursor:pointer; display: inline"><i class="fas fa-book"></i>&nbsp;Historial</h5>
+                        </div>
+                        <div class="collapse show" id="historial">
+                            <div class="card-text p-2">
+                                <table class="table table-borderless table-hover" style="height: 500px; display: -moz-groupbox;">
+                                    <thead >
+                                        <tr style="display: inline-table; height:60px; table-layout: fixed;">
+                                            <th scope="col" style="width: 65%;">Nombre</th>
+                                            <th scope="col" style="width: 11.12%;">Matrícula</th>
+                                            <th scope="col" style="width: 0%;">A</th>
+                                            <th scope="col" style="width: 0%;">R</th>
+                                            <th scope="col" style="width: 0%;">J</th>
+                                            <th scope="col">
+                                                <button type="button" class="btn btn-light btn-sm" data-toggle="popover" title="Nomenclatura" data-html="true" data-content="A - Asistencia <br>R - Retardo<br>J - Justificación<br>F - Falta">?</button>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="overflow-y: scroll; height: 450px; width: 98.5%; position: absolute;">
+                                        {% for as in asistencia %}
+                                            {% for al in alumno %}
+                                                {% if as.id_alumno == al.id_alumno %}
+                                                    <tr>
+                                                        <td style="width: 80%;">{{ al.nombre_alumno }}</td> <!--Nombre-->
+                                                        <td style="width: 11%;">{{ al.num_matricula }} </td> <!--Matrícula-->
+                                                        {% if as.asistencia is True %}
+                                                            <td style="width: 0%; padding-top: 0; float: top;"> &nbsp;&nbsp;&nbsp;<input type="checkbox" id="asistencia" checked disabled></td>
+                                                        {% else %}
+                                                            <td style="width: 0%; padding-top: 0;"> &nbsp;&nbsp;&nbsp;<input type="checkbox" id="asistencia" disabled></td>
+                                                        {% endif %}
+                                                        
+                                                        {% if as.retardo is True %}
+                                                            <td style="width: 0%; padding-top: 0;" class="text-center"> &nbsp;&nbsp;&nbsp;<input type="checkbox" id="retardo" checked disabled></td>
+                                                        {% else %}
+                                                            <td style="width: 0%; padding-top: 0;" class="text-center"> &nbsp;&nbsp;&nbsp;<input type="checkbox" id="retardo" disabled></td>
+                                                        {% endif %}
+                                                        
+                                                        {% if as.justificacion is True %}
+                                                            <td style="width: 0%; padding-top: 0;" class="text-center"> &nbsp;&nbsp;<input type="checkbox" id="justificacion" checked disabled></td>
+                                                        {% else %}
+                                                            <td style="width: 0%; padding-top: 0;" class="text-center"> &nbsp;&nbsp;<input type="checkbox" id="justificacion" disabled></td>
+                                                        {% endif %}
+
+                                                        {% if as.falta is True %}
+                                                            <td class="text-center" style="display: inline;"> <span id="spanE" class="badge badge-pill badge-danger" style="margin-top: 54.5%; margin-left: 2%; font-size: 85%; padding-top: 13%;">F</span></td>
+                                                        {% else %}
+                                                            <td class="text-center" style="display: inline;"> <span  class="badge badge-pill" style="margin-top: 54.5%; margin-left: 2%; font-size: 85%; padding-top: 13%; color: white;">&nbsp;&nbsp;&nbsp;</span></td>
+                                                        {% endif %}
+                                                    </tr>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% empty %}
+                                                    <tr>
+                                                        <td style="width: 10%;">
+                                                            <div class="alert alert-danger" role="alert">
+                                                                <div class="form-row">
+                                                                    <strong class="col-md-12 text-center">Ningún alumno correspondiente al grupo</strong>
+                                                                </div>
+                                                                <div class="form-row">
+                                                                    <p class="col-md-12 text-center">Seleccione un grupo o consúltelo con la institución.</p>
+                                                                </div>
+                                                            </div>  
+                                                        </td>
+                                                    </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <script>
+        //Funcion para cuando se selecciona un docente-modulo
+        function seleccionDocenteModulo(){
+            var sel = document.getElementById('selectDocenteModulo')
+            var val = sel.options[sel.selectedIndex].value
+            document.getElementById('inputDocenteModulo').value = val
+        }
+
+        //Funcion para poder seleccionar todo de la tanbla
+        function toggle(source) {
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            for (var i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i] != source)
+                    checkboxes[i].checked = source.checked;
+            }
+        }
+
+        // Funcion para cuando se selcciona un docente
+        function seleccionDocente(){
+            var sel = document.getElementById('selectDocente')
+            var val = sel.options[sel.selectedIndex].value
+            document.getElementById('inputDocente').value = val
+        }
+
+        // Funcion cuando se selecciona un modulo
+        function seleccionModulo(){
+            var sel = document.getElementById('selectModulo')
+            var val = sel.options[sel.selectedIndex].value
+            document.getElementById('inputModulo').value = val
+        }
+
+        // Funcion filtar alumnos
+        function filtraAlumno() {
+        // Declare variables 
+            var input, filter, table, tr, td, i;
+            input = document.getElementById("inputAlumno");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("listaAlumnos");
+            tr = table.getElementsByTagName("tr");
+
+            // Loop through all table rows, and hide those who don't match the search query
+            for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[0]; //La posición del arreglo indica el campo que se buscará
+                if (td) {
+                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                } 
+            }
+            for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[2]; //La posición del arreglo indica el campo que se buscará
+                if (td) {
+                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                } 
+            }
+        }
+    </script>
+{% endblock %}

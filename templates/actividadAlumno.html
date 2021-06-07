@@ -1,0 +1,246 @@
+{% extends 'baseTBC.html'%}
+{% load static %}
+{% block content%}
+    <title>Mis actividades</title>
+    <div class="form-row">
+        <!--Columna izquierda-->
+        <div class="col-md-6 mt-3">
+            <!--Tarjeta de mis cursos-->
+            <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="mis-cursos-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#mis-cursos" style="cursor:pointer;"><i class="fas fa-chalkboard"></i>&nbsp;Mis módulos
+                            {% for notificacion in notificacion %}
+                                {% if notificacion.status == 0 %}
+                                    <input hidden type="text" value="si" id="inputActividad">
+                                {% endif %}
+                            {% endfor %}
+                            <span hidden class="badge badge-pill badge-danger" style="margin-left: 2%; font-size: 60%; padding-top: .5%;" id="spanAct">Tiene actividades pendientes</span>
+                        </h5>
+                    </div>
+                    <div class="collapse show" id="mis-cursos">
+                        <div class="card-text p-3">
+                            <div class="form-row">
+                                <div class="col-md-12 mb-1">
+                                    <table id="tablaModulos" class="table table-hover table-borderless" style="height: 208px; display: -moz-groupbox;">
+                                        <tbody class="" style="overflow-y: scroll; height: 208px; width: 97%; position: absolute;">
+                                            {% for ac in alumnoCurso %}
+                                            <tr onclick="seleccionCurso('{{ ac.id_dc }}');" style="width: 100%; display: inline-table; height:40px; table-layout: fixed;">
+                                                {% for dc in docenteCurso %}
+                                                    {% if dc.id_dc == ac.id_dc %}
+                                                        {% for cu in modulo %}
+                                                            {% if cu.id_modulo == dc.id_curso %}
+                                                                <td style="width: 82.5%;">{{ cu.nombre_modulo }}</td>
+                                                                {% for notificacion in notificacion %}
+                                                                    {% if notificacion.status == 0 and notificacion.id_dc == ac.id_dc %}
+                                                                        <!-- {{ notificacion.id_notificacion_alumno }} -->
+                                                                        <td style="display: none;"><input type="text" id="input" class="inputNA" hidden></td>
+                                                                        <td style="display: inline;"><span hidden class="badge badge-pill badge-danger" style="margin-top: 12.5%; margin-left: 2%; font-size: 90%; padding-top: 3%;" id="spanNA"></span></td>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            {% endif %}
+                                                        {% endfor %}    
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endfor %}
+                    
+                                            
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-md-12 mb-3">
+                                    <div class="alert alert-secondary mb-0" role="alert">
+                                        <div class="form-row">
+                                            <div class=col-md-8 mb-3>
+                                                <div class="form-row">
+                                                    <div class="col-md-6 mb-2">
+                                                        <strong>Actividades totales:</strong> 
+                                                    </div>
+                                                    <div class="col-md-6 mb-2">
+                                                        <strong>Actividades evaluadas: </strong> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Columna derecha-->
+        <div class="col-md-6 mt-3">
+            <!--Tarjeta de actividades-->
+            <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="resumen-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#resumen" style="cursor:pointer;"><i class="fas fa-list-ol"></i>&nbsp;Mis actividades</h5>
+                    </div>
+                    <div class="collapse show" id="resumen">
+                        <div class="card-text p-3">
+                            <div class="form-row">
+                                <table class="table table-borderless " style="height: 287px; display: -moz-groupbox;">
+                                    <thead>
+                                        <tr style="width: 100%; display: inline-table; height:60px; table-layout: fixed;">
+                                            <th style="width: 20%;">#</th>
+                                            <th style="width: 40%;">Nombre</th>
+                                            <th style="width: 40%;">Curso</th>
+                                            <th style="width: 25%;">Acciones</th>
+                                            <th style="width: 17%;">Estatus</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="overflow-y: scroll; height: 237px; width: 97%; position: absolute;">
+                                        {% for ac in alumnoCurso %}
+                                            {% for dc in docenteCurso %}
+                                                {% for act in actividad_docente %}
+                                                    {% if dc.id_docente == act.id_docente and ac.id_dc == dc.id_dc %}
+                                                        <tr>
+                                                            <th style="width: 5%;" scope="row">{{ forloop.counter }}</th>
+                                                            <td style="padding-left: 88px; width: 35%;">{{ act.nombre_actividad }} </td>
+                                                            {% for cu in modulo %}
+                                                                {% if  act.id_curso == cu.id_modulo %}
+                                                                    <td style="padding-left: 88px; width: 55%;"> {{ cu.nombre_modulo }}</td> 
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                            <td style="padding-left: 88px;"><a href={% url 'TBC:entregaAlumno' id=act.id_actividad idAlumno=alumno.id_alumno  %} class="btn btn-outline-info btn-sm" type="submit" data-toggle="tooltip" data-placement="right" title="Entregar"><i class="fas fa-file-import"></i></a></td>
+                                                            {% for en in entrega %}
+                                                                {% if act.id_actividad == en.id_actividad %}
+                                                                    {% if en.entregada is True and en.calificada is not True%}
+                                                                        <td class="text-center" style="padding-left: 88px; width: 45%;"> <span class="badge badge-pill badge-success" style="margin-left: 2%; font-size: 85%; padding-top: 10%;">&nbsp;</h5></span></td>
+                                                                    {% endif %}
+                                                                    {% if en.entregada is True and en.calificada is True %}
+                                                                        <td style="padding-left: 88px; width: 45%;"> <span class="badge badge-pill badge-success" style="margin-left: 2%; font-size: 85%; padding-top: 25%;">R</h5></span></td>
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </tr>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="col-md-12 mb-3">
+            <!--Tarjeta de visualización de módulo-->
+            <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="modulo-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#modulo" style="cursor:pointer;"><i class="far fa-eye"></i>&nbsp;Visualización de módulo</h5>
+                    </div>
+                    <div class="collapse" id="modulo">
+                        <div class="card-text p-3">
+                            <div class="form-row">
+                                <div class="col-md-12 mb-3">
+                                    <div class="alert alert-light border border-secondary text-center" role="alert">
+                                        Matemáticas 1
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-md-8 mb-3">
+                                    <div class="alert alert-light border border-secondary text-center" role="alert">
+                                        <strong> Unidad 1 </strong>
+                                        <br>
+                                        Números negativos
+                                    </div>
+                                    <div class="alert alert-light border border-secondary text-center" role="alert">
+                                        <strong> Unidad 2 </strong>
+                                        <br>
+                                        Ecuaciones lineales
+                                    </div>
+                                    <div class="alert alert-light border border-secondary text-center" role="alert">
+                                        <strong> Unidad 3 </strong>
+                                        <br>
+                                        Trigonometría
+                                    </div>
+                                    <div class="alert alert-light border border-secondary text-center" role="alert">
+                                        <strong> Unidad 4 </strong>
+                                        <br>
+                                        Álgebra
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-4">
+                                    <div class="alert alert-light border border-secondary text-center" role="alert">
+                                        <strong> Objetivo </strong>
+                                        <br>
+                                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Unde officia temporibus 
+                                        exercitationem veritatis atque nihil he laso ke as elat
+                                    </div>
+                                    <div class="alert alert-light border border-secondary text-center" role="alert">
+                                        <strong> Competencias </strong>
+                                        <br>
+                                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Unde officia temporibus 
+                                        exercitationem veritatis atque nihil inventore Lorem
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var nA = document.getElementById('inputActividad').value
+        var sA = document.getElementById('spanAct')
+        if(nA == 'si'){
+            sA.removeAttribute('hidden')
+        }
+
+        function seleccionCurso(d){
+            var x = document.getElementById("tablaModulos").rows.length;         
+            alert(x)   
+        }
+
+        window.addEventListener('load', function () {
+            var inputs = document.getElementsByClassName('inputNA')
+            var spn = document.getElementById('spanNA')
+            //spn.removeAttribute('hidden')
+            //spn.innerHTML = inputs.length
+            var table = document.getElementById("tablaModulos");    
+            for (var i = 0, row; row = table.rows[i]; i++) {
+                p = row.getElementsByClassName('inputNA')
+                //alert(p.length)
+                if(p.length > 0){
+                    sp = row.getElementsByClassName('badge badge-pill badge-danger')
+                    sp[0].removeAttribute('hidden')
+                    sp[0].innerHTML = p.length
+                }
+                for (var j = 0, col; col = row.cells[j]; j++) {
+                }  
+            }
+        })
+        
+        //Función al dar click al eliminar docente
+        function confirmDialogDelete(id){
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: "Confirme si desea realizar la acción",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Confirmar'
+            }).then((result) => {
+                if (result.value) {
+                    window.location.replace('delete-actividad/'+id);
+                }
+                })
+        }
+    </script>
+    
+{% endblock %}

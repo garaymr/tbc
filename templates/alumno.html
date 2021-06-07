@@ -1,0 +1,622 @@
+{% extends 'baseTBC.html'%}
+{% load static %}
+{% block content%}
+    <title>Hola, {{ alumnoSel.nombre_alumno }}</title>
+    <div class="form-row">
+        <!--Columna izquierda-->
+        <div class="col-md-6 mt-3">
+            <!--Tarjeta con datos del alumno-->
+            <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="datos-generales-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#datos-generales" style="cursor:pointer;"><i class="far fa-edit"></i>&nbsp;Datos generales</h5>
+                    </div>
+                    <div class="collapse show" id="datos-generales">
+                        <div class="card-text p-3">
+                            <div class="form-row">
+                                <div class="col-md-8 mb-3">
+                                    <label for="nombreAlumno">Nombre completo</label>
+                                    <input readonly type="text" class="form-control border border-ligth" id="nombreAlumno" name="nombreAlumno"  value="{{ alumnoSel.nombre_alumno | default_if_none:'' }}">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="numMatricula">Matricula</label>
+                                    <input readonly type="text" class="form-control border border-ligth" id="numMatricula" name="numMatricula"  value="{{ alumnoSel.num_matricula | default_if_none:'' }}">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="curp">CURP</label>
+                                    <input readonly type="text" class="form-control border border-ligth" id="curp" name="curp"  value="{{ alumnoSel.curp_alumno | default_if_none:'' }}">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="telFijo">Teléfono fijo</label>
+                                    <input readonly type="number" class="form-control border border-ligth" id="telFijo" name="telFijo" value="{{ alumnoSel.tel_fijo | default_if_none:'' }}">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="telCelular">Teléfono celular</label>
+                                    <input readonly type="number" class="form-control border border-ligth" id="telCelular" name="telCelular"  value="{{ alumnoSel.tel_celular | default_if_none:'' }}">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="calle">Tipo de secundaria</label>
+                                    <select disabled class="selectpicker" data-live-search="true" title="Seleccione..." data-width="100%" id="selectSecundaria">
+                                        <option value="Telesecundaria">Telesecundaria</option>
+                                        <option value="General">General</option>
+                                        <option value="Técnica">Técnica</option>
+                                        <option value="INEA">INEA</option>
+                                    </select>
+                                    <input type="text" hidden name="tipo_secundaria" id="tipo_secundaria" value="{{ alumnoSel.tipo_secundaria | default_if_none:'' }}" >                                          
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label for="colonia">Acta de nacimiento</label>
+                                    <div class="form-row">
+                                        <div class="col-md-6">
+                                            <input type="file" name="acta" id="inputActaF" style="display: none;" />
+                                            <button disabled id="btnActaArchivo" type="button" class="btn btn-outline-primary btn-block" onclick="document.getElementById('inputActaF').click();"><i class="fas fa-upload"></i></button>
+                                        </div>
+                                        <div class="col-md-6">
+                                            {% for a in archivos %}
+                                                {% if a.tipo_archivo == "Acta nacimiento" %}
+                                                    <a id="btnActa" type="button" class="btn btn-warning btn-block" style="color: white;" target="_blank" href="{{ a.url }}"><i class="fas fa-eye"></i></a>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label for="curpArchivo">CURP</label><br>
+                                    <div class="form-row">
+                                        <div class="col-md-6">
+                                            <input type="file" name="curpArchivo" id="inputCURP" style="display: none;" />
+                                            <button disabled id="btnCurpArchivo" type="button" class="btn btn-outline-primary btn-block" onclick="document.getElementById('inputCURP').click();"><i class="fas fa-upload"></i></button>
+                                        </div>
+                                        <div class="col-md-6">
+                                            {% for a in archivos %}
+                                                {% if a.tipo_archivo == "Curp" %}
+                                                    <a id="btnCurp" type="button" class="btn btn-warning btn-block" style="color: white;" target="_blank" href="{{ a.url }}"><i class="fas fa-eye"></i></a>   
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>                              
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label for="numExt">Certificado secundaria</label>
+                                    <div class="form-row">
+                                        <div class="col-md-6">
+                                            <input type="file" name="certificado" id="inputCertificadoF" style="display: none;" />
+                                            <button disabled id="btnCertificadoArchivo" type="button" class="btn btn-outline-primary btn-block" onclick="document.getElementById('inputCertificadoF').click();"><i class="fas fa-upload"></i></button>
+                                        </div>
+                                        <div class="col-md-6">
+                                            {% for a in archivos %}
+                                                {% if a.tipo_archivo == "Certificado secundaria" %}
+                                                    <a id="btnCertificado" type="button" class="btn btn-warning btn-block" style="color: whitesmoke;" target="_blank" href="{{ a.url }}"><i class="fas fa-eye"></i></a>  
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>    
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mt-3">
+            <!--Tarjeta datos institucionales-->
+            <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="datos-institucionales-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#datos-institucionales" style="cursor:pointer;"><i class="fas fa-school"></i>&nbsp;Datos institucionales</h5>
+                    </div>
+                    <div class="collapse show" id="datos-institucionales">
+                        <div class="card-text p-3">
+                            <div class="form-row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="semestre">Semestre</label>
+                                    <input readonly type="number" class="form-control border border-ligth" id="semestre" name="semestre" value="{{ alumnoSel.semestre | default_if_none:'' }}">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="nombreEscuela">Nombre de la institución</label>
+                                    <input readonly type="text" class="form-control border border-ligth" id="nombreEscuela" name="nombreEscuela"  value="{{ alumnoSel.nombre_escuela | default_if_none:'' }}">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="cct">CCT</label>
+                                    <input readonly type="text" class="form-control border border-ligth" id="cct" name="cct" value="{{ alumnoSel.cct | default_if_none:'' }}">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-md-2 mb-2">
+                                    <label for="nss">Solicitar NSS</label><br>
+                                    <button class="btn btn-outline-primary btn-block" type="button" id="btnNss" onclick="solicitarNss();">Solicitar</button>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <label for="beca">¿Cuenta con beca?</label>
+                                    <select disabled id="selectBeca" class="selectpicker" data-live-search="true" title="Seleccione..." data-width="100%" >
+                                        <option value="si">Sí</option>
+                                        <option value="no">No</option>
+                                    </select>
+                                    <input type="text" hidden name="beca" id="beca" value="{{ alumnoSel.beca | default_if_none:'' }}">   
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <a for="subsistema" data-toggle="tooltip" title="Llenar sólo en caso de ser necesario">Subsistema proveniente</a>
+                                    <input readonly style="margin-top: 0.5em;" type="text" class="form-control border border-ligth" id="subsistema_nombre" name="subsistema_nombre" value="{{ alumnoSel.subsistema_nombre | default_if_none:'' }}">
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <label for="subsistemaF">Subir equivalencia</label>
+                                    <div class="form-row">
+                                        <div class="col-md-6 mb-2">
+                                            <input type="file" name="subsistema" id="inputSubsistema" style="display: none;" />
+                                            <button disabled id="btnSubsistemaF" type="button" class="btn btn-outline-primary btn-block" onclick="document.getElementById('inputSubsistema').click();"><i class="fas fa-upload"></i></button>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            {% for a in archivos %}
+                                                {% if a.tipo_archivo == "Subsistema" %}
+                                                    <a id="btnSubsistema" type="button" class="btn btn-warning btn-block" style="color: white;" target="_blank" href="{{ a.url }}"><i class="fas fa-eye"></i></a>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="email">Email</label>
+                                    <input readonly type="email" class="form-control border border-ligth" id="email" name="email"  value="{{ alumnoSel.email | default_if_none:'' }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="password">Contraseña</label>
+                                    <input readonly type="text" class="form-control border border-ligth" id="contrasena" name="contrasena" minlength="8" value="">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-row">
+                <div class="col-md-12">
+                    <!--Tarjeta de gráfico 2-->
+                    <div class="container-flex" id="wwg-accordian">
+                        <div class="card">
+                            <div class="card-header" id="modulo-heading" style="background-color: white;">      
+                                <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#modulo" style="cursor:pointer;"><i class="fas fa-chart-bar"></i>&nbsp;Reporte por módulos</h5>
+                            </div>
+                            <div class="collapse show" id="modulo">
+                                <div class="card-text p-3">
+                                    <canvas id="myChart" width="800" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-row">
+        <!--Columna derecha-->
+        <div class="col-md-6 mt-3">
+            <!--Tarjeta de modulos-->
+            <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="modulos-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#modulos" style="cursor:pointer;"><i class="far fa-file-alt"></i>&nbsp;Módulos</h5>
+                    </div>
+                    <div class="collapse show" id="modulos">
+                        <div class="card-text p-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control border border-ligth rounded-left" placeholder="Search" name="buscarModulo" id="inputModulo" onkeyup="filtraModulo();">
+                                <div class="input-group-btn border border-ligth rounded-right">
+                                    <button class="btn btn-default" style="cursor: context-menu;">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <table class="table table-borderless table-hover" id="listaModulo" style="height: 290px; display: -moz-groupbox;">
+                                <thead>
+                                  <tr style="width: 100%; display: inline-table; height:60px; table-layout: fixed;">
+                                    <th style="width: 5%;">#</th>
+                                    <th style="width: 5.8%;">Nombre</th>
+                                    <th style="width: 3.5%;">Semestre</th>
+                                    <th style="width: 5%;">Créditos</th>
+                                  </tr>
+                                </thead>
+                                <tbody style="overflow-y: scroll; height: 240px; width: 95%; position: absolute;">
+                                        {% for modulo in modulo %}
+                                            <tr>
+                                                <td style="width: 5%">{{ forloop.counter }}</td>
+                                                <td style="width: 60%;">{{ modulo.nombre_modulo }}</td>
+                                                <td style="width: 15%;">{{ modulo.semestre_modulo_id }}</td>
+                                                <td style="width: 15%;">{{ modulo.creditos_modulo }}</td>
+                                                <td ><button class="btn btn-outline-warning btn-sm" onclick="graficoModulo('{{ modulo.id_modulo }}');"><i class="far fa-eye"></i></button></td>
+                                            </tr>
+                                        {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mt-3">
+            <!--Tarjeta de resumen de alumno-->
+            <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="resumen-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#resumen" style="cursor:pointer;"><i class="fas fa-archive"></i>&nbsp;Resumen de calificaciones</h5>
+                    </div>
+                    <div class="collapse show" id="resumen">
+                        <div class="card-text p-2">
+                            <div class="form-row">
+                                <!--Nombres de etiquetas-->
+                                <div class="col-md-6 p-3" style="padding-bottom: 0;">
+                                    <label for=""> Nombre</label>
+                                    <br>
+                                    <label for=""> No. control</label>
+                                    <br>
+                                    <label for=""> Fecha ingreso</label>
+                                    <br>
+                                    <label for=""> Promedio general</label>
+                                    <br>
+                                    <label for=""> Promedio 1er semestre</label>
+                                    <br>
+                                    <label for=""> Promedio 2do semestre</label>
+                                    <br>
+                                    <label for=""> Promedio 3er semestre</label>
+                                    <br>
+                                    <label for=""> Promedio 4to semestre</label>
+                                    <br>
+                                    <label for=""> Promedio 5to semestre</label>
+                                    <br>
+                                    <label for=""> Promedio 6to semestre</label>
+                                </div>
+                                <!--Datos-->
+                                <div class="col-md-6 p-3 text-right" style="padding-bottom: 0;">
+                                    <label id="l_nombre_alumno"> {{ estadistica.nombre_alumno }} </label>
+                                    <br>
+                                    <label id="l_num_matricula"> {{ estadistica.num_matricula }} </label>
+                                    <br>
+                                    <label id="l_periodo2"> </label>
+                                    <br>
+                                    <label id="l_promedio_final"> {{ estadistica.promedio_final | default_if_none:'' }} </label>
+                                    <br>
+                                    <label id="l_prom_gen_1"> {{ estadistica.prom_general_1 | default_if_none:'' }} </label>
+                                    <br>
+                                    <label id="l_prom_gen_2"> {{ estadistica.promedio_general_2 | default_if_none:'' }} </label>
+                                    <br>
+                                    <label id="l_promedio_gen_3"> {{ estadistica.promedio_general_3 | default_if_none:'' }} </label>
+                                    <br>
+                                    <label id="l_promedio_gen_4"> {{ estadistica.promedio_general_4 | default_if_none:'' }} </label>
+                                    <br>
+                                    <label id="l_promedio_gen_5"> {{ estadistica.promedio_general_5 | default_if_none:'' }} </label>
+                                    <br>
+                                    <label id="l_promedio_gen_6"> {{ estadistica.promedio_general_6 | default_if_none:'' }} </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        //Se obtienen datos de la vista de python para asignarlos a variables y manejarlos con las graficas
+        var lista = {% autoescape off %}{{ data2 }}{% endautoescape %}
+        var labelsA = {% autoescape off %}{{ labels2 }}{% endautoescape %}
+        var archivoS = {% autoescape off %}{{ archivoSubsistema }}{% endautoescape %}
+        window.onload = function selects(){
+            //Para colocar el valor a los selects
+            var tipo_secundariaA = document.getElementById('tipo_secundaria').value;
+            $('#selectSecundaria').selectpicker('val', tipo_secundariaA);
+            var becaA = document.getElementById('beca').value;
+            $('#selectBeca').selectpicker('val', becaA);
+            var indices = []
+            var aux = 0
+            for(var i = 0; i < lista.length; i++){
+                for(var j = 0; j < lista[i].length; j++){
+                    if (lista[i][j] === 5){
+                        indices.push(aux);
+                    }
+                    aux += 1
+                }
+            }
+            if(indices.length != 0)
+                materiaReprobada(indices);
+        }
+
+        //Alerta de materia reprobada
+        function materiaReprobada(indices){
+            //Indices tiene el o los indices de la asignatura la cual está reprobada, se procede a compararla con un array de asignaturas y asignar en caso de ser reprobada
+            var asignaturas = [' Matemáticas 1',' Física 1',' Ética 1',' Metodología de la investigación',' Taller de lectura y Redacción 1',' Inglés 1',' Matemáticas 2',' Física 2',' Ética 2',' Introducción a las Ciencias Sociales',' Taller de Lectura y Redacción',' Inglés 2',' Matemáticas 3'
+                                ,' Química 1',' Biología 1',' Historia de México 1',' Literatura 1',' Inglés 2',' Submódulo 1 de formación para el trabajo',' Matemáticas 4',' Química 2',' Biología 2',' Historia de México 2'
+                                ,' Literatura 2',' Inglés 4',' Submódulo 2 de formación para el trabajo',' Geografía',' Historia Universal Contemporánea',' Componente disciplinar extendido de Matemáticas y Ciencias Experimentales',' Componente disciplinar extendido de Ciencias Sociales y Humanidades',' Componente disciplinar extendido de Comunicación',' Submódulo 3 de formación para el trabajo']
+            var asignaturasR = []
+            for(var i = 0; i < asignaturas.length; i++){
+                for(var j = 0; j < indices.length; j++){
+                    if (indices[j] == i)
+                        asignaturasR.push(asignaturas[i])
+                }
+            }
+            //Alert para avisar si se tiene asignaturas reprobadas
+            Swal.fire({
+                title: '¡Tienes asignaturas reprobadas!',
+                html: 'Las asignaturas son: <br>'+asignaturasR,
+                icon: 'warning',
+                showCancelButton: false,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ok!',
+                width: '650px',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    //Alert para avisar si tiene equivalencia y si no tiene archivo
+                    var susb = document.getElementById('subsistema_nombre').value;
+                    if(susb != ''){
+                        if(archivoS[1] != 'Subsistema'){
+                            Swal.fire({
+                                icon: 'info',
+                                title: '¡La institución no tiene tu archivo de equivalencia!',
+                                text: 'Bríndala a tu responsable de inmediato.',
+                                width: '650px',
+                            })
+                        }
+                    }else{
+                        Swal.close()
+                    }
+                    
+                }
+            })
+        }
+
+        //Sweetalert para nss
+        function solicitarNss(){
+            Swal.fire({
+                title: 'Ten a la mano lo siguiente:',
+                text: "¡CURP y tu correo electrónico!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ok, ¡llévame ahí!'
+                }).then((result) => {
+                if (result.isConfirmed) {
+                    window.open('https://serviciosdigitales.imss.gob.mx/gestionAsegurados-web-externo/asignacionNSS', '_blank');
+                }
+                })
+        }
+
+        //Funcion cuando selecciona una secundaria colocar el valor en un input
+        function seleccionaSecundaria(){
+            var sel = document.getElementById('selectSecundaria')
+            var val = sel.options[sel.selectedIndex].value
+            document.getElementById('tipo_secundaria').value = val
+        }
+
+        //Funcion cuando selecciona una opcion colocar el valor en un input
+        function seleccionaBeca(){
+            var sel = document.getElementById('selectBeca')
+            var val = sel.options[sel.selectedIndex].value
+            document.getElementById('beca').value = val
+        }
+
+        //Funcion para filtar la tabla de moudulos
+        function filtraModulo() {
+        // Declare variables 
+            var input, filter, table, tr, td, i;
+            input = document.getElementById("inputModulo");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("listaModulo");
+            tr = table.getElementsByTagName("tr");
+            // Loop through all table rows, and hide those who don't match the search query
+            for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[1]; //La posición del arreglo indica el campo que se buscará
+                if (td) {
+                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                } 
+            }
+        }
+        
+        //Comienza sección de gráficas
+        var ctx = document.getElementById('myChart').getContext('2d');
+        //labelsG tiene los nombres de todos los modulos
+        var labelsG = {% autoescape off %}{{ labels }}{% endautoescape %}
+        //dataG tiene los promedios de cada moudulo
+        var dataG = {% autoescape off %}{{ data }}{% endautoescape %}
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labelsG,//['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17'],
+                datasets: [{
+                    label: 'Promedio por módulo',
+                    data: dataG, //[8.3, 7.0, 7.0, 7.0, 6.0, 7.0, 8.3, 8.0, 8.0, 7.0, 7.8, 9.6, 6.7, 8.9, 6.4, 9.9, 9.6],
+                    backgroundColor: [
+                        '#ff4500', '#da70d6', '#eee8aa', '#98fb98', '#afeeee', '#db7093',
+                        '#ffefd5', '#ffdab9', '#cd853f', '#ffc0cb', '#dda0dd', '#b0e0e6',
+                        '#800080', '#ff0000', '#bc8f8f', '#fa8072', '#f4a460'
+                    ],
+                    borderColor: [],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }],
+                    xAxes: [{
+                        barPercentage: 0.5
+                    }]
+                }
+            }
+        });
+
+        //Funcion para cuando se selecciona un modulo para ver su gráfico
+        function graficoModulo(id_modulo){
+            data = []
+            labels2A = []
+            switch(id_modulo){
+                case '1':
+                    data.push(lista[0][0])
+                    data.push(lista[0][1])
+                    labels2A.push(labelsA[0])
+                    labels2A.push(labelsA[1])
+                    break;
+                case '2':
+                    data.push(lista[1][0])
+                    data.push(lista[1][1])
+                    labels2A.push(labelsA[2])
+                    labels2A.push(labelsA[3])
+                    break;
+                case '3':
+                    data.push(lista[2][0])
+                    data.push(lista[2][1])
+                    labels2A.push(labelsA[4])
+                    labels2A.push(labelsA[5])
+                    break;
+                case '4':
+                    data.push(lista[3][0])
+                    data.push(lista[3][1])
+                    labels2A.push(labelsA[6])
+                    labels2A.push(labelsA[7])
+                    break;
+                case '5':
+                    data.push(lista[4][0])
+                    data.push(lista[4][1])
+                    labels2A.push(labelsA[8])
+                    labels2A.push(labelsA[9])
+                    break;
+                case '6':
+                    data.push(lista[5][0])
+                    data.push(lista[5][1])
+                    labels2A.push(labelsA[10])
+                    labels2A.push(labelsA[11])
+                    break;
+                case '7':
+                    data.push(lista[6][0])
+                    data.push(lista[6][1])
+                    data.push(lista[6][2])
+                    labels2A.push(labelsA[12])
+                    labels2A.push(labelsA[13])
+                    labels2A.push(labelsA[14])
+                    break;
+                case '8':
+                    data.push(lista[7][0])
+                    labels2A.push(labelsA[15])
+                    break;
+                case '9':
+                    data.push(lista[8][0])
+                    data.push(lista[8][1])
+                    labels2A.push(labelsA[16])
+                    labels2A.push(labelsA[17])
+                    break;
+                case '10':
+                    data.push(lista[9][0])
+                    labels2A.push(labelsA[18])
+                    break;
+                case '11':
+                    data.push(lista[10][0])
+                    data.push(lista[10][1])
+                    data.push(lista[10][2])
+                    labels2A.push(labelsA[19])
+                    labels2A.push(labelsA[20])
+                    labels2A.push(labelsA[21])
+                    break;
+                case '12':
+                    data.push(lista[11][0])
+                    labels2A.push(labelsA[22])
+                    break;
+                case '13':
+                    data.push(lista[12][0])
+                    data.push(lista[12][1])
+                    labels2A.push(labelsA[23])
+                    labels2A.push(labelsA[24])
+                    break;
+                case '14':
+                    data.push(lista[13][0])
+                    labels2A.push(labelsA[25])
+                    break;
+                case '15':
+                    data.push(lista[14][0])
+                    labels2A.push(labelsA[26])
+                    break;
+                case '16':
+                    data.push(lista[15][0])
+                    labels2A.push(labelsA[27])
+                    break;
+                case '17':
+                    data.push(lista[16][0])
+                    labels2A.push(labelsA[28])
+                    break;
+                case '18':
+                    data.push(lista[17][0])
+                    labels2A.push(labelsA[29])
+                    break;
+                case '19':
+                    data.push(lista[18][0])
+                    labels2A.push(labelsA[30])
+                    break;
+                case '20':
+                    data.push(lista[19][0])
+                    labels2A.push(labelsA[31])
+                    break;
+            }
+            updateConfigAsNewObject(myChart, data, labels2A);
+        }
+
+        //Funcion para actualizar el grafico de reporte por modulo
+        function updateConfigAsNewObject(chart, newData, labels2) {
+            chart.data = {
+                labels: labels2,
+                datasets: [{
+                    label: 'Promedio de la asignatura',
+                    data: newData,
+                    backgroundColor: [
+                    '#E666B3', '#33991A', '#CC9999', '#B3B31A', '#00E680', 
+                    '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
+                    '#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A', 
+                    '#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC',
+                    '#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6', 
+                    '#66994D', '#B366CC', '#4D8000', '#B33300', '#CC80CC', 
+                    '#66664D', '#991AFF', '#E666FF', '#4DB3FF', '#1AB399',
+                    '#E666B3', '#33991A', '#CC9999', '#B3B31A', '#00E680', 
+                    '#4D8066', '#809980', '#E6FF80', '#1AFF33', '#999933',
+                    '#FF3380', '#CCCC00', '#66E64D', '#4D80CC', '#9900B3', 
+                    '#E64D66', '#4DB380', '#FF4D4D', '#99E6E6', '#6666FF'
+                    ],
+                    borderColor: [],
+                    borderWidth: 1
+                }]
+            }
+            chart.options = {
+                scales: {
+                    xAxes: [{
+                        barPercentage: 0.1
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            steps: 1,
+                            min: 0,
+                            max: 10,
+                        }
+                    }],
+                }
+            }
+            chart.update();
+        }
+        //Se cambian los id de los modulos por sus nombres correspondientes
+        var rows = document.getElementsByTagName("table")[0].rows;
+        var last = rows[rows.length - 1];
+        var cell = last.cells[0];
+        var value = cell.innerHTML;
+        
+    </script>
+    
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends 'baseTBC.html'%}
+{% load static %}
+{% block content%}
+    <title>Estadística</title>
+    <div class="form-row">
+        <!--Columna izquierda-->
+        <div class="col-md-6 mt-3">
+            <!--Tarjeta de mis cursos-->
+            <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="modulos-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#modulos" style="cursor:pointer;"><i class="far fa-file-alt"></i>&nbsp;Reportes</h5>
+                    </div>
+                    <div class="collapse show" id="modulos">
+                        <div class="card-text p-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control border border-ligth rounded-left" placeholder="Search" name="buscarAlumno" id="inputAlumno" onkeyup="filtraAlumno();">
+                                <div class="input-group-btn border border-ligth rounded-right">
+                                    <button class="btn btn-default" style="cursor: context-menu;">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <table class="table table-borderless table-hover" id="listaAlumnos" style="height: 255px; display: -moz-groupbox;">
+                                <thead>
+                                  <tr style="width: 100%; display: inline-table; height:60px; table-layout: fixed;">
+                                    <th style="width: 25%;">#</th>
+                                    <th style="width: 30%;">Nombre</th>
+                                    <th style="width: 21%;">Tipo</th>
+                                    <th>Fecha</th>
+                                  </tr>
+                                </thead>
+                                <tbody style="overflow-y: scroll; height: 205px; width: 95%; position: absolute;">
+                                        <tr>
+                                            <td style="width: 5%">1</td>
+                                            <td style="width: 50%;">Módulo matemáticas, fuerzas y movimiento 1</td>
+                                            <td style="width: 22%;">Calificaciones</td>
+                                            <td style="width: 15%;">02/10/2020</td>
+                                            <td ><button class="btn btn-outline-warning btn-sm" type="submit"><i class="far fa-eye"></i></button></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 5%">2</td>
+                                            <td style="width: 50%;">Módulo matemáticas, fuerzas y movimiento 1</td>
+                                            <td style="width: 22%;">Asistencia</td>
+                                            <td style="width: 15%;">02/10/2020</td>
+                                            <td ><button class="btn btn-outline-warning btn-sm" type="submit"><i class="far fa-eye"></i></button></td>
+                                        </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Columna derecha-->
+        <div class="col-md-6 mt-3">
+            <!--Tarjeta de Gráfico 1-->
+            <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="resumen-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#resumen" style="cursor:pointer;"><i class="fas fa-chart-pie"></i>&nbsp;Gráfico 1</h5>
+                    </div>
+                    <div class="collapse show" id="resumen">
+                        <div class="card-text p-3">
+                            <canvas id="myChart2" width="350" height="150"></canvas>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="col-md-12 mb-3">
+            <!--Tarjeta de gráfico 2-->
+            <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="modulo-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#modulo" style="cursor:pointer;"><i class="fas fa-chart-bar"></i>&nbsp;Gráfico 2</h5>
+                    </div>
+                    <div class="collapse show" id="modulo">
+                        <div class="card-text p-3">
+                            <canvas id="myChart" width="800" height="230"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        //Grafico de barras
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+                datasets: [{
+                    label: 'Promedio',
+                    data: [8.3, 7.0, 7.0, 7.0, 6.0, 7.0, 8.3, 8.0, 8.0, 7.0],
+                    backgroundColor: [
+                        '#9C27B0', '#F44336','#FFEB3B','#FF5722','#4CAF50','#00BCD4',
+                        '#8BC34A','#795548', '#673AB7', '#FFC107'
+                    ],
+                    borderColor: [],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+        //Pastel
+        new Chart(document.getElementById("myChart2"), {
+            type: 'pie',
+            data: {
+            labels: ["Asistencia", "Retardo", "Justificación", "Falta"],
+            datasets: [{
+                label: "Reporte de asistencias",
+                backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
+                data: [1150,30,5,15] //total 1200 (10 alumnos, 120 días)
+            }]
+            },
+            options: {
+            title: {
+                display: true,
+                text: 'Reporte de asistencias en el módulo de Matemáticas, fuerzas y movimiento durante el semestre ene-jun'
+            }
+            }
+        });
+    </script>
+    
+{% endblock %}

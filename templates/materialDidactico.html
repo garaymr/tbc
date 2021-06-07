@@ -1,0 +1,229 @@
+{% extends 'baseTBC.html'%}
+{% load static %}
+{% block content%}
+    <title>Material didáctico</title>
+    <div class="form-row">
+        <!--Columna izquierda-->
+        <div class="col-md-6 mt-3">
+            <!--Tarjeta de lista de alumnos-->
+            <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="alumnos-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#alumnos" style="cursor:pointer;"><i class="fas fa-shapes"></i>&nbsp;Materiales didácticos</h5>
+                    </div>
+                    <div class="collapse show" id="alumnos">
+                        <div class="card-text p-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control border border-ligth rounded-left" placeholder="Search" name="buscarAlumno" id="inputAlumno" onkeyup="filtraAlumno();">
+                                <div class="input-group-btn border border-ligth rounded-right">
+                                    <button class="btn btn-default" style="cursor: context-menu;">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <table class="table table-borderless table-hover" id="listaAlumnos" style="height: 250px; display: -moz-groupbox;">
+                                <thead>
+                                  <tr style="width: 100%; display: inline-table; height:60px; table-layout: fixed;">
+                                    <th style="width: 10%;">#</th>
+                                    <th>Nombre</th>
+                                  </tr>
+                                </thead>
+                                <tbody style="overflow-y: scroll; height: 200px; width: 95%; position: absolute;">
+                                    <tr>
+                                        <td style="width: 12%;">1</td>
+                                        <td style="width: 100%" >Libro matemáticas, fuerzas y movimiento</td>
+                                        <td style=""><button class="btn btn-outline-info btn-sm" type="submit"><i class="far fa-edit"></i></button></td>
+                                        <td style=""><button class="btn btn-outline-danger btn-sm" onclick="confirmDialogDelete('{{ al.id_alumno }}')" style="cursor: pointer;"> <i class="far fa-trash-alt"></i> </button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Tarjeta de resumen de alumno-->
+            <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="resumen-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#resumen" style="cursor:pointer;"><i class="fas fa-archive"></i>&nbsp;Resumen del material</h5>
+                    </div>
+                    <div class="collapse show" id="resumen">
+                        <div class="card-text p-2">
+                            <div class="form-row">
+                                <!--Nombres de etiquetas-->
+                                <div class="col-md-6 p-3" style="padding-bottom: 0;">
+                                    <label for=""> Nombre</label>
+                                    <br>
+                                    <label for=""> Tipo </label>
+                                    <br>
+                                    <label for=""> Tamaño</label>
+                                    <br>
+                                    <label for=""> Archivo</label>
+                                    <br>
+                                    <label for=""> Autor</label>
+                                    <br>
+                                    <label for=""> Fecha del archivo</label>
+                                    <br>
+                                    <label for=""> Fecha de registro</label>
+                                    <br>
+                                    <label for=""> Descripción</label>
+                                    <br>
+                                    <label for=""> Módulo</label>
+                                </div>
+                                <!--Datos-->
+                                <div class="col-md-6 p-3 text-right" style="padding-bottom: 0;">
+                                    <label id="l_nombre_alumno"> Libro matemáticas, fuerzas y movimiento</label>
+                                    <br>
+                                    <label id="l_num_matricula"> PDF </label>
+                                    <br>
+                                    <label id="l_periodo2"> 10mb </label>
+                                    <br>
+                                    <label id="l_periodo2"> libro_mat_fm1modulo.pdf </label>
+                                    <br>
+                                    <label id="l_promedio_final"> SEP </label>
+                                    <br>
+                                    <label id="l_prom_gen_1"> 2012 </label>
+                                    <br>
+                                    <label id="l_prom_gen_2"> 01/10/2020 </label>
+                                    <br>
+                                    <label id="l_prom_gen_3"> Libro otorgado por la SEP </label>
+                                    <br>
+                                    <label id="l_prom_gen_4"> Matemáticas, fuerzas y movimiento </label>
+                                    <br>
+                                    <label id="l_prom_gen_5"> </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Columna derecha-->
+        <div class="col-md-6 mt-3">
+            <form class="needs-validation" novalidate method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+                <!--Tarjeta con formulario del alumno-->
+                <div class="container-flex mb-3" id="wwg-accordian">
+                    <div class="card">
+                        <div class="card-header" id="datos-generales-heading" style="background-color: white;">      
+                            <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#datos-generales" style="cursor:pointer;"><i class="far fa-edit"></i>&nbsp;Datos</h5>
+                        </div>
+                        <div class="collapse show" id="datos-generales">
+                            <div class="card-text p-3">
+                                <div class="form-row">
+                                    <input type="text" id="idAlumno" name="idAlumno" hidden>
+                                    <div class="col-md-8 mb-3">
+                                        <label for="nombreAlumno">Nombre</label>
+                                        <input type="text" class="form-control border border-ligth" id="nombreAlumno" name="nombreAlumno" placeholder="Nombre" required value="{{ alumnoSel.nombre_alumno | default_if_none:'' }}">
+                                        <div class="invalid-tooltip">
+                                            Por favor introduzca el nombre
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="numMatricula">Tipo</label>
+                                        <input type="text" class="form-control border border-ligth" id="numMatricula" name="numMatricula" placeholder="Matricula" required value="{{ alumnoSel.num_matricula | default_if_none:'' }}">
+                                        <div class="invalid-tooltip">
+                                            Por favor introduzca la matricula
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="curp">Autor</label>
+                                        <input type="text" class="form-control border border-ligth" id="curp" name="curp" placeholder="CURP" required value="{{ alumnoSel.curp_alumno | default_if_none:'' }}">
+                                        <div class="invalid-tooltip">
+                                            Introduzca la CURP
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="telFijo">Fecha</label>
+                                        <input type="number" class="form-control border border-ligth" id="telFijo" name="telFijo" placeholder="Teléfono fijo" required value="{{ alumnoSel.tel_fijo | default_if_none:'' }}">
+                                        <div class="invalid-tooltip">
+                                            Introduzca el teléfono
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="telCelular">Fecha registro</label>
+                                        <input type="text" class="form-control border border-ligth" id="telCelular" name="telCelular" placeholder="Teléfono celular" required value="01/10/2020" disabled>
+                                        <div class="invalid-tooltip">
+                                            Introduzca el número de celular
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="calle">Módulo</label>
+                                        <select class="selectpicker" data-live-search="true" title="Seleccione..." data-width="100%" onchange="seleccionaSecundaria();" id="selectSecundaria">
+                                            <option>Telesecundaria</option>
+                                            <option>General</option>
+                                            <option>Técnica</option>
+                                            <option>INEA</option>
+                                        </select>
+                                        <input type="text" hidden name="tipo_secundaria" id="tipo_secundaria">                                          
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="colonia">Archivo</label>
+                                        <div class="form-row">
+                                            <div class="col-md-6">
+                                                <input type="file" name="acta" id="inputActaF" style="display: none;" />
+                                                <button id="btnActaArchivo" type="button" class="btn btn-outline-primary btn-block" onclick="document.getElementById('inputActaF').click();"><i class="fas fa-upload"></i></button>
+                                                <!-- <input type="button" value="Buscar..." class="btn btn-outline-primary btn-block" onclick="document.getElementById('inputActa').click();" /> -->
+                                            </div>
+                                            <div class="col-md-6">
+                                                <a id="btnActa" type="button" class="btn btn-warning btn-block" style="color: white;" target="_blank"><i class="fas fa-eye"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label for="curpArchivo">Archivo extra</label><br>
+                                        <div class="form-row">
+                                            <div class="col-md-6">
+                                                <input type="file" name="curpArchivo" id="inputCURP" style="display: none;" />
+                                                <button id="btnCurpArchivo" type="button" class="btn btn-outline-primary btn-block" onclick="document.getElementById('inputCURP').click();"><i class="fas fa-upload"></i></button>
+                                                <!-- <input type="button" value="B" class="btn btn-outline-primary " onclick="document.getElementById('inputCURP').click();" /> -->
+                                            </div>
+                                            <div class="col-md-6">
+                                                <a id="btnCurp" type="button" class="btn btn-warning btn-block" style="color: white;" target="_blank"><i class="fas fa-eye"></i></a>   
+                                            </div>
+                                        </div>                              
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="numExt">Enlace</label>
+                                        <div class="form-row">
+                                            <input disabled type="email" class="form-control border border-ligth" id="email" name="email" >
+                                        </div>
+                                    </div>
+                                </div>    
+                                <div class="form-row">
+                                        <a class="btn btn-outline-success btn-block" onclick="confirmDialog()" style="cursor: pointer;">Guardar</a>
+                                        <button class="btn btn-outline-success btn-block" hidden type="submit" id="btnGuardar"></button></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Tarjeta datos institucionales-->
+                <div class="container-flex mb-3" id="wwg-accordian">
+                    <div class="card">
+                        <div class="card-header" id="datos-institucionales-heading" style="background-color: white;">      
+                            <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#datos-institucionales" style="cursor:pointer;"><i class="far fa-eye"></i>&nbsp;Previsualización de enlaces</h5>
+                        </div>
+                        <div class="collapse show" id="datos-institucionales">
+                            <div class="card-text p-3">
+                                <!-- Campos para insertar en CustomUser -->
+                                <div class="form-row">
+                                    <div class="col-md-12">
+                                        <div class="alert alert-warning text-center" role="alert">
+                                            <strong>No se ha seleccionado un enlace</strong>
+                                        </div>  
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+{% endblock %}

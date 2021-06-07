@@ -1,0 +1,217 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8">
+		<link rel="icon" href="https://cdn3.iconfinder.com/data/icons/education-and-school-8/48/Education-512.png">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="_token" content="{{ csrf_token }}">
+		<link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link rel="stylesheet" type="text/css" href="{% static 'css/styleBaseTBC.css' %}" >
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
+		<link rel="stylesheet" type="text/css" href="{% static 'css/jquery.datetimepickerTBC.css'%} ">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.css" integrity="sha512-C7hOmCgGzihKXzyPU/z4nv97W0d9bv4ALuuEbSf6hm93myico9qa0hv4dODThvCsqQUmKmLcJmlpRmCaApr83g==" crossorigin="anonymous" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.css" integrity="sha512-/zs32ZEJh+/EO2N1b0PEdoA10JkdC3zJ8L5FTiQu82LR9S/rOQNfQN7U59U9BC12swNeRAz3HSzIL2vpp4fv3w==" crossorigin="anonymous" />
+ 	 </head>
+	<body>
+		<script src="https://kit.fontawesome.com/ae665b182b.js" crossorigin="anonymous"></script>
+		<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+		<!-- <script src="{% static 'js/jquery-datetimepicker/jquery.js' %} "></script> -->
+		<script src="https://code.jquery.com/jquery-3.1.1.min.js"> </script>
+ 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+		<script src="{% static 'js/TBCjquery.datetimepicker.full.min.js' %}  "></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw==" crossorigin="anonymous"></script>
+		<!--Navbar lateral-->	
+		<div class="wrapper d-flex align-items-stretch" >
+			<nav id="sidebar" style="background-color: #3A3A3A;">
+				<div class="custom-menu"> 
+					<button  type="button" id="sidebarCollapse" class="btn btn-primary">
+	          			<i class="fa fa-bars"></i>
+	          			<i class="sr-only">Toggle Menu</i>
+	        		</button>
+        		</div>
+				<div class="p-4">
+					  <h1><a href="/TBC" class="logo">STBC</a></h1> <!--Titulo Sidebar-->
+	        		<ul class="list-unstyled components mb-5">
+						<!-- Si es un alumno (7) -->
+						{% if usuario.tipo_usuario == "7" %}
+						<li hidden>
+	            			<a href="#"><i class="fa fa-book-open mr-3" ></i> Material didactico</a>
+						</li>
+						<li>
+							<a href="#"><i class="fa fa-certificate
+							 mr-3" ></i> Imprimir constancia</a>
+	          			</li>
+						{% endif %}
+						<!-- Si es una institución (1) -->
+						{% if usuario.tipo_usuario == "1" %}  
+						<li>
+	            			<a href="#collapseAlumnos" data-toggle="collapse" aria-controls="collapseAlumnos" aria-expanded="false"><i class="fa fa-users mr-3" ></i> Alumnos</a>
+	          			</li>
+	          				<ul class="collapse" id="collapseAlumnos" style="list-style: disc;">
+	          					<li>
+	          						<a href="/TBC/consulta-alumnos">
+	          							<i class="fa fa-edit"></i>
+	          							Consulta
+	          						</a>
+	          					</li>
+	          					<li hidden>
+	          						<a href="/TBC/historial-academico">
+	          							<i class="fa fa-vcard"></i>
+	          							Historial Acádemico
+	          						</a>	
+	          					</li>
+	          				</ul>
+						
+						<li>
+							<a href="#collapseDocentes" data-toggle="collapse" aria-controls="collapseDocentes" aria-expanded="false"><i class="fas fa-chalkboard-teacher mr-3"></i> Docentes</a>
+						</li>
+						<ul class="collapse" id="collapseDocentes" style="list-style: disc;">
+								<li>
+									<a href="/TBC/consulta-docentes">
+										<i class="fa fa-edit"></i>
+										Consulta
+									</a>
+								</li>  
+								<li  hidden>
+	          						<a href="/TBC/pase-lista">
+	          							<i class="fa fa-check-square"></i>
+	          							Pase de lista
+	          						</a>
+	          					</li>
+	          				</ul>
+						<li  hidden>
+							<a href="#collapseProgramas" data-toggle="collapse" aria-controls="collapseProgramas" aria-expanded="false"><i class="fa fa-clone mr-3"></i> Módulos</a>
+						</li>
+						<ul class="collapse" id="collapseProgramas" style="list-style: disc;">
+	          					<li  hidden>
+	          						<a href="Modulos/nuevo">
+	          							<i class="fa fa-plus"></i>
+	          							Añadir Módulo
+	          						</a>
+								  </li>
+								  <li  hidden>
+									<a href="/TBC/relacionar-modulo">
+										<i class="fas fa-exchange-alt"></i>
+										Relacionar módulo
+									</a>
+								</li>
+	          					<li  hidden>
+	          						<a href="#">
+	          							<i class="fa fa-folder-open-o"></i>
+	          							Consultar Módulos
+	          						</a>	
+	          					</li>
+	          					<li  hidden>
+	          						<a href="#">
+	          							<i class="fa fa-line-chart"></i>
+	          							Comparar Módulos
+	          						</a>	
+	          					</li>
+	          				</ul>
+						<li>
+							<a href="#collapseCertificaciones" data-toggle="collapse" aria-controls="collapseCertificaciones" aria-expanded="false"><i class="fa fa-mortar-board mr-3"></i> Certificaciones</a>
+						</li>
+						<ul class="collapse" id="collapseCertificaciones" style="list-style: disc;">
+	          					<li>
+	          						<a href="#">
+	          							<i class="fa fa-plus"></i>
+	          							Generar Certificado
+	          						</a>
+	          					</li>
+	          					<li>
+	          						<a href="#">
+	          							<i class="fa fa-certificate"></i>
+	          							Certificados expedidos
+	          						</a>	
+	          					</li>
+							  </ul>
+						{% endif %}
+						<!-- Si es un docente (6) -->
+						{% if usuario.tipo_usuario == "6" %}  
+						<li>
+	            			<a href="#collapseAlumnos" data-toggle="collapse" aria-controls="collapseAlumnos" aria-expanded="false"><i class="fa fa-users mr-3" ></i> Alumnos</a>
+	          			</li>
+	          				<ul class="collapse" id="collapseAlumnos" style="list-style: disc;">
+	          					<li>
+	          						<a href="/TBC/consulta-alumnos">
+	          							<i class="fa fa-edit"></i>
+	          							Consulta
+	          						</a>
+								</li>
+								<li>
+									<a href="/TBC/subir-estadistica">
+										<i class="fas fa-file-upload"></i>&nbsp;
+										Subir información estadística
+									</a>
+								</li>
+	          					<li  hidden>
+	          						<a href="/TBC/historial-academico">
+	          							<i class="fa fa-vcard"></i>
+	          							Historial Acádemico
+	          						</a>	
+								</li>
+								<li  hidden>
+									<a href="/TBC/pase-lista">
+										<i class="fa fa-check-square"></i>
+										Pase de lista
+									</a>
+								</li>
+								<li  hidden>
+									<a href="/TBC/actividades-aprendizaje">
+										<i class="fa fa-folder-open-o"></i>
+										Actividades de Aprendizaje
+									</a>	
+								</li>
+	          				</ul>
+						{% endif %}
+						{% if usuario.tipo_usuario == "1" %}
+							<li>
+								<a href="{% url 'perfil' %}" ><i class="fas fa-arrow-left"></i>&emsp;&nbsp;&nbsp;Volver</a>
+							</li>
+						{% endif %}
+						<li>
+							<a href="{% url 'logout' %}" ><i class="fas fa-sign-out-alt"></i>&emsp;&nbsp;&nbsp;Cerrar sesión</a>
+						</li>
+					</ul>
+					<div class="mb-5">
+						<form action="#" class="subscribe-form">
+						</form>
+					</div>
+					<div>
+						
+					</div>
+					<div class="footer">
+						<p>Copyright &copy;</p>
+					</div>
+					
+	    		</div>
+			</nav>
+			<!-- Navbar superior -->
+			<div id="content" class="ml-5">
+				<nav class="navbar navbar-expand-lg navbar-light bg-light">
+					<a class="navbar-brand" href="{% url 'perfil' %}">Secretaria de Educación</a>
+					<a> {{usuario.first_name}} {{ usuario.last_name}} </a>
+				  </nav>
+				  <div class="pl-3 pr-5 pt-3">
+					  {% block content %}
+					  {% endblock %}
+				  </div>
+			</div>
+		</div>
+	<!-- Scripts para la barra lateral -->
+	<script src="{% static 'js/TBCpopperBase.js' %}"></script>
+	<script src="{% static 'js/TBCbootstrapBase.min.js' %}"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+	<script src="{% static 'js/TBCmainBase.js' %}"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+	{% load sweetify %}
+	{% sweetify %}
+  </body>
+</html>

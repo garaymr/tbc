@@ -1,0 +1,380 @@
+{% extends 'baseTBC.html'%}
+{% load static %}
+{% block content%}
+    <title>Historial académico</title>
+    <div class="form-row">
+        <div class="col-md-12">
+            <!--Tarjeta de filtro e info-->
+            <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="filtroInfo-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#filtroInfo" style="cursor:pointer;"><i class="far fa-eye"></i>&nbsp;Búsqueda e información</h5>
+                    </div>
+                    <div class="collapse show" id="filtroInfo">
+                        <div class="card-text p-3">
+                            <!-- Usuario: docente (6) -->
+                            {% if usuario.tipo_usuario == "6" %}  
+                                <div class="form-row mb-3">
+                                    <div class="col-md-11 mb-3">
+                                        <select class="selectpicker" data-live-search="true" data-width="100%" data-size="4" title="Buscar alumno..."  id="selectAlumnos" onchange="seleccionAlumno();">
+                                            {% for al in alumno %}
+                                            <option value="{{ al.nombre_alumno }}">{{ al.nombre_alumno }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1 mb-3">
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            <input type="text" id="inputAlumno" name="nombreAlumno" hidden>
+                                            <button class="btn btn-outline-info btn-block" type="submit">Buscar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-12">
+                                        <div class="alert alert-secondary" role="alert">
+                                            <div class="form-row">
+                                                <div class="col-md-4 mb-3">
+                                                    <strong>Nombre:</strong> {{ alumnoSel.nombre_alumno | default_if_none:''}}
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <strong>Semestre: </strong> {{ alumnoSel.semestre | default_if_none:'' }}
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <strong>Fecha de ingreso:</strong> {{ alumnoSel.periodo2 | default_if_none:''}}
+                                                </div>
+                                            </div>
+                                            <div class="form-row">
+                                                <div class="col-md-4 mb-2">
+                                                    <strong>Matrícula:</strong> {{ alumnoSel.num_matricula | default_if_none:''}}
+                                                </div>
+                                                <div class="col-md-4 mb-2">
+                                                    <strong>Promedio general: </strong> {{ alumnoSel.promedio_final | default_if_none:''}}
+                                                </div>
+                                                <div class="col-md-4 mb-2">
+                                                    <strong>Institución: </strong> {{ alumnoSel.nombre_escuela }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <!-- Usuario: institucion (1) -->
+                            {% if usuario.tipo_usuario == "1" %}  
+                                <div class="form-row mb-3">
+                                    <div class="col-md-11 mb-3">
+                                        <select class="selectpicker" data-live-search="true" data-width="100%" data-size="4" title="Seleccionar semestre..."  id="selectGrupo" onchange="seleccionGrupo();">
+                                            <option value="1">Semestre 1</option>
+                                            <option value="2">Semestre 2</option>
+                                            <option value="3">Semestre 3</option>
+                                            <option value="4">Semestre 4</option>
+                                            <option value="5">Semestre 5</option>
+                                            <option value="6">Semestre 6</option>
+                                            <!-- {% for al in alumno %}
+                                                <option value="{{ al.cct }}">{{ al.cct }}</option>
+                                            {% endfor %} -->
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1 mb-3">
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            <input type="text" id="inputAlumno" name="nombreAlumno" hidden>
+                                            <input type="text" id="inputGrupo" name="grupo" hidden>
+                                            <button class="btn btn-outline-info btn-block" type="submit">Buscar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Tarjeta del carousel-->
+    <div class="container-flex mb-3" id="wwg-accordian">
+        <div class="card">
+            <div class="card-header" id="carousel-heading" style="background-color: white;">      
+                <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#carousel" style="cursor:pointer;"><i class="fas fa-clipboard"></i>&nbsp;Historial</h5>
+            </div>
+            <div class="collapse show" id="carousel">
+                <div class="card-text p-3">
+                    <!--Carousel con tabla-->
+                    <div id="demo" class="carousel slide" data-ride="carousel">
+                        <!-- Indicators -->
+                        <ul class="carousel-indicators">
+                        <li data-target="#demo" data-slide-to="0" class="active"></li>
+                        <li data-target="#demo" data-slide-to="1"></li>
+                        <li data-target="#demo" data-slide-to="2"></li>
+                        </ul>
+                        <!-- The slideshow -->
+                        <div class="carousel-inner">
+                            <!-- Carousel para 1 solo alumno (docente/alumno - 2) -->
+                            {% if usuario.tipo_usuario == "6" %}
+                                <div class="carousel-item active">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">1er semestre</th>
+                                                <th scope="col">2do semestre</th>
+                                                <th scope="col">3er semestre</th>
+                                                <th scope="col">4to semestre</th>
+                                                <th scope="col">5to semestre</th>
+                                                <th scope="col">6to semestre</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Matemáticas 1 <br> Parcial 1: {{ alumnoSel.mat1p1 }} <br> Parcial 2: {{ alumnoSel.mat1p2 }} <br> Parcial 3: {{ alumnoSel.mat1pr }} <br> <strong> Promedio: {{ alumnoSel.prom_mat1 }} </strong> </td> <!--1er semestre-->
+                                                <td>Matemáticas 2 <br> Parcial 1: {{ alumnoSel.mat2p1 }} <br> Parcial 2: {{ alumnoSel.mat2p2 }} <br> Parcial 3: {{ alumnoSel.mat2p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_mat2 }} </strong> </td> <!--2do semestre-->
+                                                <td>Matemáticas 3 <br> Parcial 1: {{ alumnoSel.mat3p1 }} <br> Parcial 2: {{ alumnoSel.mat3p2 }} <br> Parcial 3: {{ alumnoSel.mat3p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_mat3 }} </strong> </td> <!--3er semestre-->
+                                                <td>Matemáticas 4 <br> Parcial 1: {{ alumnoSel.mat4p1 }} <br> Parcial 2: {{ alumnoSel.mat4p2 }} <br> Parcial 3: {{ alumnoSel.mat4p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_mat4 }} </strong> </td> <!--4to semestre-->
+                                                <td>Geografía 1 <br> Parcial 1: {{ alumnoSel.geog1 }} <br> Parcial 2: {{ alumnoSel.geog2 }} <br> Parcial 3: {{ alumnoSel.geog3 }} <br> <strong> Promedio: {{ alumnoSel.prom_geog }} </strong> </td> <!--5to semestre-->
+                                                <td>Filosofía 1 <br> Parcial 1: {{ alumnoSel.filos1 }} <br> Parcial 2: {{ alumnoSel.filos2 }} <br> Parcial 3: {{ alumnoSel.filos3 }} <br> <strong> Promedio: {{ alumnoSel.prom_filos }} </strong> </td><!--6to semestre-->
+                                            </tr>
+                                            <tr>
+                                                <td>Química 1 <br> Parcial 1: {{ alumnoSel.q1p1 }} <br> Parcial 2: {{ alumnoSel.q1p2 }} <br> Parcial 3: {{ alumnoSel.q1p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_q1 }} </strong> </td>
+                                                <td>Química 2 <br> Parcial 1: {{ alumnoSel.q2p1 }} <br> Parcial 2: {{ alumnoSel.q2p2 }} <br> Parcial 3: {{ alumnoSel.q2p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_q2 }} </strong> </td> 
+                                                <td>Biología 1 <br> Parcial 1: {{ alumnoSel.bio1p1 }} <br> Parcial 2: {{ alumnoSel.bio1p2 }} <br> Parcial 3: {{ alumnoSel.bio1p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_bio1 }} </strong> </td> 
+                                                <td>Biología 2 <br> Parcial 1: {{ alumnoSel.bio2p1 }} <br> Parcial 2: {{ alumnoSel.huc2 }} <br> Parcial 3: {{ alumnoSel.huc3 }} <br> <strong> Promedio: {{ alumnoSel.prom_huc }} </strong> </td> 
+                                                <td>Huc <br> Parcial 1: {{ alumnoSel.huc1 }} <br> Parcial 2: {{ alumnoSel.bio2p2 }} <br> Parcial 3: {{ alumnoSel.bio2p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_bio2 }} </strong> </td>
+                                                <td>Ema <br> Parcial 1: {{ alumnoSel.ema1 }} <br> Parcial 2: {{ alumnoSel.ema2 }} <br> Parcial 3: {{ alumnoSel.ema3 }} <br> <strong> Promedio: {{ alumnoSel.prom_ema }} </strong> </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Evp 1 <br> Parcial 1: {{ alumnoSel.evp1 }} <br> Parcial 2: {{ alumnoSel.evp2 }} <br> Parcial 3: {{ alumnoSel.evp3 }} <br> <strong> Promedio: {{ alumnoSel.prom_ev1 }} </strong> </td>
+                                                <td>Evp 2 <br> Parcial 1: {{ alumnoSel.ev2p1 }} <br> Parcial 2: {{ alumnoSel.ev2p2 }} <br> Parcial 3: {{ alumnoSel.ev2p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_ev2 }} </strong> </td>
+                                                <td>Física 1 <br> Parcial 1: {{ alumnoSel.fis1p1 }} <br> Parcial 2: {{ alumnoSel.fis1p2 }} <br> Parcial 3: {{ alumnoSel.fis1p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_fis1 }} </strong> </td> 
+                                                <td>Física 2 <br> Parcial 1: {{ alumnoSel.fis2p1 }} <br> Parcial 2: {{ alumnoSel.fis2p2 }} <br> Parcial 3: {{ alumnoSel.fis2p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_fis2 }} </strong> </td>
+                                                <td>Derecho 1 <br> Parcial 1: {{ alumnoSel.derech1 }} <br> Parcial 2: {{ alumnoSel.derech2 }} <br> Parcial 3: {{ alumnoSel.derech3 }} <br> <strong> Promedio: {{ alumnoSel.prom_derech }} </strong> </td>
+                                                <td>Metodología de la investigación<br> Parcial 1: {{ alumnoSel.met_1 }} <br> Parcial 2: {{ alumnoSel.met_2 }} <br> Parcial 3: {{ alumnoSel.met_3 }} <br> <strong> Promedio: {{ alumnoSel.prom_met_inv }} </strong> </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Icsp 1 <br> Parcial 1: {{ alumnoSel.icsp1 }} <br> Parcial 2: {{ alumnoSel.icsp2 }} <br> Parcial 3: {{ alumnoSel.icsp3 }} <br> <strong> Promedio: {{ alumnoSel.prom_icsp }} </strong> </td>
+                                                <td>Hmi 1 <br> Parcial 1: {{ alumnoSel.hmi1 }} <br> Parcial 2: {{ alumnoSel.hmi2 }} <br> Parcial 3: {{ alumnoSel.hmi3 }} <br> <strong> Promedio: {{ alumnoSel.prom_hmi }} </strong> </td>
+                                                <td>Hmi 2 <br> Parcial 1: {{ alumnoSel.hmii1 }} <br> Parcial 2: {{ alumnoSel.hmii2 }} <br> Parcial 3: {{ alumnoSel.hmii3 }} <br> <strong> Promedio: {{ alumnoSel.prom_hmii }} </strong> </td>
+                                                <td>Esm <br> Parcial 1: {{ alumnoSel.esmp1 }} <br> Parcial 2: {{ alumnoSel.esmp2 }} <br> Parcial 3: {{ alumnoSel.esmp3 }} <br> <strong> Promedio: {{ alumnoSel.prom_esm }} </strong> </td>
+                                                <td>Cc <br> Parcial 1: {{ alumnoSel.cc1 }} <br> Parcial 2: {{ alumnoSel.cc2 }} <br> Parcial 3: {{ alumnoSel.cc3 }} <br> <strong> Promedio: {{ alumnoSel.prom_cc }} </strong> </td>
+                                                <td>Derecho 2 <br> Parcial 1: {{ alumnoSel.derech16 }} <br> Parcial 2: {{ alumnoSel.derech27 }} <br> Parcial 3: {{ alumnoSel.derech38 }} <br> <strong> Promedio: {{ alumnoSel.prom_derech2 }} </strong> </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Tlr 1 <br> Parcial 1: {{ alumnoSel.tlrp1 }} <br> Parcial 2: {{ alumnoSel.tlrp2 }} <br> Parcial 3: {{ alumnoSel.tlrp3 }} <br> <strong> Promedio: {{ alumnoSel.prom_tlr1 }} </strong> </td>
+                                                <td>Tlr 2 <br> Parcial 1: {{ alumnoSel.tlr2p1 }} <br> Parcial 2: {{ alumnoSel.tlr2p2 }} <br> Parcial 3: {{ alumnoSel.tlr2p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_tlr2 }} </strong> </td>
+                                                <td>Lit 1 <br> Parcial 1: {{ alumnoSel.litip1 }} <br> Parcial 2: {{ alumnoSel.litip2 }} <br> Parcial 3: {{ alumnoSel.litip3 }} <br> <strong> Promedio: {{ alumnoSel.prom_liti }} </strong> </td>
+                                                <td>Lit 2 <br> Parcial 1: {{ alumnoSel.lit2p1 }} <br> Parcial 2: {{ alumnoSel.lit2p2 }} <br> Parcial 3: {{ alumnoSel.lit2p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_lit2 }} </strong> </td>
+                                                <td>Cs <br> Parcial 1: {{ alumnoSel.cs1 }} <br> Parcial 2: {{ alumnoSel.cs2 }} <br> Parcial 3: {{ alumnoSel.cs3 }} <br> <strong> Promedio: {{ alumnoSel.prom_cs }} </strong> </td>
+                                                <td>Cc 2 <br> Parcial 1: {{ alumnoSel.cc19 }} <br> Parcial 2: {{ alumnoSel.cc210 }} <br> Parcial 3: {{ alumnoSel.cc311 }} <br> <strong> Promedio: {{ alumnoSel.prom_cc2 }} </strong> </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Lae 1 <br> Parcial 1: {{ alumnoSel.lae1p1 }} <br> Parcial 2: {{ alumnoSel.lae1p2 }} <br> Parcial 3: {{ alumnoSel.lae1p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_lae1 }}</strong></td>
+                                                <td>Lae 2 <br> Parcial 1: {{ alumnoSel.lae2p1 }} <br> Parcial 2: {{ alumnoSel.lae2p2 }} <br> Parcial 3: {{ alumnoSel.lae2p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_lae2 }}</strong></td>
+                                                <td>Lae 3 <br> Parcial 1: {{ alumnoSel.lae3p1 }} <br> Parcial 2: {{ alumnoSel.lae3p2 }} <br> Parcial 3: {{ alumnoSel.lae3p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_lae3 }}</strong></td>
+                                                <td>Lae 4 <br> Parcial 1: {{ alumnoSel.lae4p1 }} <br> Parcial 2: {{ alumnoSel.lae4p2 }} <br> Parcial 3: {{ alumnoSel.lae4p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_lae4 }}</strong></td>
+                                                <td>Proyes <br> Parcial 1: {{ alumnoSel.proyes1 }} <br> Parcial 2: {{ alumnoSel.proyes2 }} <br> Parcial 3: {{ alumnoSel.proyes3 }} <br> <strong> Promedio: {{ alumnoSel.prom_proyes }}</strong></td>
+                                                <td>Cs 2<br> Parcial 1: {{ alumnoSel.cs112 }} <br> Parcial 2: {{ alumnoSel.cs213 }} <br> Parcial 3: {{ alumnoSel.cs314 }} <br> <strong> Promedio: {{ alumnoSel.prom_cs2 }}</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Ap 1 <br> Parcial 1: {{ alumnoSel.app1 }} <br> Parcial 2: {{ alumnoSel.app2 }} <br> Parcial 3: {{ alumnoSel.app3 }} <br> <strong> Promedio: {{ alumnoSel.prom_ap1 }}</strong></td>
+                                                <td>Ap 2 <br> Parcial 1: {{ alumnoSel.ap2p1 }} <br> Parcial 2: {{ alumnoSel.ap2p2 }} <br> Parcial 3: {{ alumnoSel.ap2p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_ap2 }}</strong></td>
+                                                <td>Dc 1 <br> Parcial 1: {{ alumnoSel.dc1p1 }} <br> Parcial 2: {{ alumnoSel.dc1p2 }} <br> Parcial 3: {{ alumnoSel.dc1p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_dc1 }}</strong></td>
+                                                <td>Dc 2 <br> Parcial 1: {{ alumnoSel.dc2p1 }} <br> Parcial 2: {{ alumnoSel.dc2p2 }} <br> Parcial 3: {{ alumnoSel.dc2p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_dc2 }}</strong></td>
+                                                <td>Dc 3 <br> Parcial 1: {{ alumnoSel.dc3p1 }} <br> Parcial 2: {{ alumnoSel.dc3p2 }} <br> Parcial 3: {{ alumnoSel.dc3p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_dc3 }}</strong></td>
+                                                <td>Proyes 2 <br> Parcial 1: {{ alumnoSel.proyes115 }} <br> Parcial 2: {{ alumnoSel.proyes216 }} <br> Parcial 3: {{ alumnoSel.proyes317 }} <br> <strong> Promedio: {{ alumnoSel.prom_proyes2 }}</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td>Ap 3 <br> Parcial 1: {{ alumnoSel.ap3p1 }} <br> Parcial 2: {{ alumnoSel.ap3p2 }} <br> Parcial 3: {{ alumnoSel.ap3p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_ap3 }}</strong></td>
+                                                <td>Ap 4 <br> Parcial 1: {{ alumnoSel.ap4p1 }} <br> Parcial 2: {{ alumnoSel.ap4p2 }} <br> Parcial 3: {{ alumnoSel.ap4p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_ap4 }}</strong></td>
+                                                <td>Ap 5 <br> Parcial 1: {{ alumnoSel.ap5p1 }} <br> Parcial 2: {{ alumnoSel.ap5p2 }} <br> Parcial 3: {{ alumnoSel.ap5p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_ap5 }}</strong></td>
+                                                <td>Dc 4 <br> Parcial 1: {{ alumnoSel.dc3p118 }} <br> Parcial 2: {{ alumnoSel.dc3p219 }} <br> Parcial 3: {{ alumnoSel.dc3p320 }} <br> <strong> Promedio: {{ alumnoSel.prom_dc4 }}</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td>Ap 6 <br> Parcial 1: {{ alumnoSel.ap6p1 }} <br> Parcial 2: {{ alumnoSel.ap6p2 }} <br> Parcial 3: {{ alumnoSel.ap6p3 }} <br> <strong> Promedio: {{ alumnoSel.prom_ap6  }}</strong></td>
+                                            </tr>
+                                            <!--Promedio general por semestre-->
+                                            <tr>
+                                                <td> <strong> Promedio general: {{ alumnoSel.prom_general_1 }} </strong></td>
+                                                <td> <strong> Promedio general: {{ alumnoSel.promedio_general_2 }} </strong> </td>
+                                                <td> <strong> Promedio general: {{ alumnoSel.promedio_general_3 }} </strong> </td>
+                                                <td> <strong> Promedio general: {{ alumnoSel.promedio_general_4 }} </strong> </td>
+                                                <td> <strong> Promedio general: {{ alumnoSel.promedio_general_5 }} </strong> </td>
+                                                <td> <strong> Promedio general: {{ alumnoSel.promedio_general_6 }} </strong> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                <br>
+                                <strong> {{ alumnoSel.nombre_alumno }} </strong>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <!-- Aquí en caso de que se genere por grupos (Institucion - 1 )-->
+                        {% if usuario.tipo_usuario == "1" %}
+                            <div class="carousel-inner">
+                                {% for alG in alumnoGrupo %}
+                                    <div class="carousel-item {% if forloop.first %} active {% endif %}">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">1er semestre</th>
+                                                    <th scope="col">2do semestre</th>
+                                                    <th scope="col">3er semestre</th>
+                                                    <th scope="col">4to semestre</th>
+                                                    <th scope="col">5to semestre</th>
+                                                    <th scope="col">6to semestre</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Matemáticas 1 <br> Parcial 1: {{ alG.mat1p1 }} <br> Parcial 2: {{ alG.mat1p2 }} <br> Parcial 3: {{ alG.mat1pr }} <br> <strong> Promedio: {{ alG.prom_mat1 }} </strong> </td> <!--1er semestre-->
+                                                    <td>Matemáticas 2 <br> Parcial 1: {{ alG.mat2p1 }} <br> Parcial 2: {{ alG.mat2p2 }} <br> Parcial 3: {{ alG.mat2p3 }} <br> <strong> Promedio: {{ alG.prom_mat2 }} </strong> </td> <!--2do semestre-->
+                                                    <td>Matemáticas 3 <br> Parcial 1: {{ alG.mat3p1 }} <br> Parcial 2: {{ alG.mat3p2 }} <br> Parcial 3: {{ alG.mat3p3 }} <br> <strong> Promedio: {{ alG.prom_mat3 }} </strong> </td> <!--3er semestre-->
+                                                    <td>Matemáticas 4 <br> Parcial 1: {{ alG.mat4p1 }} <br> Parcial 2: {{ alG.mat4p2 }} <br> Parcial 3: {{ alG.mat4p3 }} <br> <strong> Promedio: {{ alG.prom_mat4 }} </strong> </td> <!--4to semestre-->
+                                                    <td>Geografía 1 <br> Parcial 1: {{ alG.geog1 }} <br> Parcial 2: {{ alG.geog2 }} <br> Parcial 3: {{ alG.geog3 }} <br> <strong> Promedio: {{ alG.prom_geog }} </strong> </td> <!--5to semestre-->
+                                                    <td>Filosofía 1 <br> Parcial 1: {{ alG.filos1 }} <br> Parcial 2: {{ alG.filos2 }} <br> Parcial 3: {{ alG.filos3 }} <br> <strong> Promedio: {{ alG.prom_filos }} </strong> </td><!--6to semestre-->
+                                                </tr>
+                                                <tr>
+                                                    <td>Química 1 <br> Parcial 1: {{ alG.q1p1 }} <br> Parcial 2: {{ alG.q1p2 }} <br> Parcial 3: {{ alG.q1p3 }} <br> <strong> Promedio: {{ alG.prom_q1 }} </strong> </td>
+                                                    <td>Química 2 <br> Parcial 1: {{ alG.q2p1 }} <br> Parcial 2: {{ alG.q2p2 }} <br> Parcial 3: {{ alG.q2p3 }} <br> <strong> Promedio: {{ alG.prom_q2 }} </strong> </td> 
+                                                    <td>Biología 1 <br> Parcial 1: {{ alG.bio1p1 }} <br> Parcial 2: {{ alG.bio1p2 }} <br> Parcial 3: {{ alG.bio1p3 }} <br> <strong> Promedio: {{ alG.prom_bio1 }} </strong> </td> 
+                                                    <td>Biología 2 <br> Parcial 1: {{ alG.bio2p1 }} <br> Parcial 2: {{ alG.huc2 }} <br> Parcial 3: {{ alG.huc3 }} <br> <strong> Promedio: {{ alG.prom_huc }} </strong> </td> 
+                                                    <td>Huc <br> Parcial 1: {{ alG.huc1 }} <br> Parcial 2: {{ alG.bio2p2 }} <br> Parcial 3: {{ alG.bio2p3 }} <br> <strong> Promedio: {{ alG.prom_bio2 }} </strong> </td>
+                                                    <td>Ema <br> Parcial 1: {{ alG.ema1 }} <br> Parcial 2: {{ alG.ema2 }} <br> Parcial 3: {{ alG.ema3 }} <br> <strong> Promedio: {{ alG.prom_ema }} </strong> </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Evp 1 <br> Parcial 1: {{ alG.evp1 }} <br> Parcial 2: {{ alG.evp2 }} <br> Parcial 3: {{ alG.evp3 }} <br> <strong> Promedio: {{ alG.prom_ev1 }} </strong> </td>
+                                                    <td>Evp 2 <br> Parcial 1: {{ alG.ev2p1 }} <br> Parcial 2: {{ alG.ev2p2 }} <br> Parcial 3: {{ alG.ev2p3 }} <br> <strong> Promedio: {{ alG.prom_ev2 }} </strong> </td>
+                                                    <td>Física 1 <br> Parcial 1: {{ alG.fis1p1 }} <br> Parcial 2: {{ alG.fis1p2 }} <br> Parcial 3: {{ alG.fis1p3 }} <br> <strong> Promedio: {{ alG.prom_fis1 }} </strong> </td> 
+                                                    <td>Física 2 <br> Parcial 1: {{ alG.fis2p1 }} <br> Parcial 2: {{ alG.fis2p2 }} <br> Parcial 3: {{ alG.fis2p3 }} <br> <strong> Promedio: {{ alG.prom_fis2 }} </strong> </td>
+                                                    <td>Derecho 1 <br> Parcial 1: {{ alG.derech1 }} <br> Parcial 2: {{ alG.derech2 }} <br> Parcial 3: {{ alG.derech3 }} <br> <strong> Promedio: {{ alG.prom_derech }} </strong> </td>
+                                                    <td>Metodología de la investigación<br> Parcial 1: {{ alG.met_1 }} <br> Parcial 2: {{ alG.met_2 }} <br> Parcial 3: {{ alG.met_3 }} <br> <strong> Promedio: {{ alG.prom_met_inv }} </strong> </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Icsp 1 <br> Parcial 1: {{ alG.icsp1 }} <br> Parcial 2: {{ alG.icsp2 }} <br> Parcial 3: {{ alG.icsp3 }} <br> <strong> Promedio: {{ alG.prom_icsp }} </strong> </td>
+                                                    <td>Hmi 1 <br> Parcial 1: {{ alG.hmi1 }} <br> Parcial 2: {{ alG.hmi2 }} <br> Parcial 3: {{ alG.hmi3 }} <br> <strong> Promedio: {{ alG.prom_hmi }} </strong> </td>
+                                                    <td>Hmi 2 <br> Parcial 1: {{ alG.hmii1 }} <br> Parcial 2: {{ alG.hmii2 }} <br> Parcial 3: {{ alG.hmii3 }} <br> <strong> Promedio: {{ alG.prom_hmii }} </strong> </td>
+                                                    <td>Esm <br> Parcial 1: {{ alG.esmp1 }} <br> Parcial 2: {{ alG.esmp2 }} <br> Parcial 3: {{ alG.esmp3 }} <br> <strong> Promedio: {{ alG.prom_esm }} </strong> </td>
+                                                    <td>Cc <br> Parcial 1: {{ alG.cc1 }} <br> Parcial 2: {{ alG.cc2 }} <br> Parcial 3: {{ alG.cc3 }} <br> <strong> Promedio: {{ alG.prom_cc }} </strong> </td>
+                                                    <td>Derecho 2 <br> Parcial 1: {{ alG.derech16 }} <br> Parcial 2: {{ alG.derech27 }} <br> Parcial 3: {{ alG.derech38 }} <br> <strong> Promedio: {{ alG.prom_derech2 }} </strong> </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Tlr 1 <br> Parcial 1: {{ alG.tlrp1 }} <br> Parcial 2: {{ alG.tlrp2 }} <br> Parcial 3: {{ alG.tlrp3 }} <br> <strong> Promedio: {{ alG.prom_tlr1 }} </strong> </td>
+                                                    <td>Tlr 2 <br> Parcial 1: {{ alG.tlr2p1 }} <br> Parcial 2: {{ alG.tlr2p2 }} <br> Parcial 3: {{ alG.tlr2p3 }} <br> <strong> Promedio: {{ alG.prom_tlr2 }} </strong> </td>
+                                                    <td>Lit 1 <br> Parcial 1: {{ alG.litip1 }} <br> Parcial 2: {{ alG.litip2 }} <br> Parcial 3: {{ alG.litip3 }} <br> <strong> Promedio: {{ alG.prom_liti }} </strong> </td>
+                                                    <td>Lit 2 <br> Parcial 1: {{ alG.lit2p1 }} <br> Parcial 2: {{ alG.lit2p2 }} <br> Parcial 3: {{ alG.lit2p3 }} <br> <strong> Promedio: {{ alG.prom_lit2 }} </strong> </td>
+                                                    <td>Cs <br> Parcial 1: {{ alG.cs1 }} <br> Parcial 2: {{ alG.cs2 }} <br> Parcial 3: {{ alG.cs3 }} <br> <strong> Promedio: {{ alG.prom_cs }} </strong> </td>
+                                                    <td>Cc 2 <br> Parcial 1: {{ alG.cc19 }} <br> Parcial 2: {{ alG.cc210 }} <br> Parcial 3: {{ alG.cc311 }} <br> <strong> Promedio: {{ alG.prom_cc2 }} </strong> </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Lae 1 <br> Parcial 1: {{ alG.lae1p1 }} <br> Parcial 2: {{ alG.lae1p2 }} <br> Parcial 3: {{ alG.lae1p3 }} <br> <strong> Promedio: {{ alG.prom_lae1 }}</strong></td>
+                                                    <td>Lae 2 <br> Parcial 1: {{ alG.lae2p1 }} <br> Parcial 2: {{ alG.lae2p2 }} <br> Parcial 3: {{ alG.lae2p3 }} <br> <strong> Promedio: {{ alG.prom_lae2 }}</strong></td>
+                                                    <td>Lae 3 <br> Parcial 1: {{ alG.lae3p1 }} <br> Parcial 2: {{ alG.lae3p2 }} <br> Parcial 3: {{ alG.lae3p3 }} <br> <strong> Promedio: {{ alG.prom_lae3 }}</strong></td>
+                                                    <td>Lae 4 <br> Parcial 1: {{ alG.lae4p1 }} <br> Parcial 2: {{ alG.lae4p2 }} <br> Parcial 3: {{ alG.lae4p3 }} <br> <strong> Promedio: {{ alG.prom_lae4 }}</strong></td>
+                                                    <td>Proyes <br> Parcial 1: {{ alG.proyes1 }} <br> Parcial 2: {{ alG.proyes2 }} <br> Parcial 3: {{ alG.proyes3 }} <br> <strong> Promedio: {{ alG.prom_proyes }}</strong></td>
+                                                    <td>Cs 2<br> Parcial 1: {{ alG.cs112 }} <br> Parcial 2: {{ alG.cs213 }} <br> Parcial 3: {{ alG.cs314 }} <br> <strong> Promedio: {{ alG.prom_cs2 }}</strong></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Ap 1 <br> Parcial 1: {{ alG.app1 }} <br> Parcial 2: {{ alG.app2 }} <br> Parcial 3: {{ alG.app3 }} <br> <strong> Promedio: {{ alG.prom_ap1 }}</strong></td>
+                                                    <td>Ap 2 <br> Parcial 1: {{ alG.ap2p1 }} <br> Parcial 2: {{ alG.ap2p2 }} <br> Parcial 3: {{ alG.ap2p3 }} <br> <strong> Promedio: {{ alG.prom_ap2 }}</strong></td>
+                                                    <td>Dc 1 <br> Parcial 1: {{ alG.dc1p1 }} <br> Parcial 2: {{ alG.dc1p2 }} <br> Parcial 3: {{ alG.dc1p3 }} <br> <strong> Promedio: {{ alG.prom_dc1 }}</strong></td>
+                                                    <td>Dc 2 <br> Parcial 1: {{ alG.dc2p1 }} <br> Parcial 2: {{ alG.dc2p2 }} <br> Parcial 3: {{ alG.dc2p3 }} <br> <strong> Promedio: {{ alG.prom_dc2 }}</strong></td>
+                                                    <td>Dc 3 <br> Parcial 1: {{ alG.dc3p1 }} <br> Parcial 2: {{ alG.dc3p2 }} <br> Parcial 3: {{ alG.dc3p3 }} <br> <strong> Promedio: {{ alG.prom_dc3 }}</strong></td>
+                                                    <td>Proyes 2 <br> Parcial 1: {{ alG.proyes115 }} <br> Parcial 2: {{ alG.proyes216 }} <br> Parcial 3: {{ alG.proyes317 }} <br> <strong> Promedio: {{ alG.prom_proyes2 }}</strong></td>
+                                                </tr>
+                                                <tr>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>Ap 3 <br> Parcial 1: {{ alG.ap3p1 }} <br> Parcial 2: {{ alG.ap3p2 }} <br> Parcial 3: {{ alG.ap3p3 }} <br> <strong> Promedio: {{ alG.prom_ap3 }}</strong></td>
+                                                    <td>Ap 4 <br> Parcial 1: {{ alG.ap4p1 }} <br> Parcial 2: {{ alG.ap4p2 }} <br> Parcial 3: {{ alG.ap4p3 }} <br> <strong> Promedio: {{ alG.prom_ap4 }}</strong></td>
+                                                    <td>Ap 5 <br> Parcial 1: {{ alG.ap5p1 }} <br> Parcial 2: {{ alG.ap5p2 }} <br> Parcial 3: {{ alG.ap5p3 }} <br> <strong> Promedio: {{ alG.prom_ap5 }}</strong></td>
+                                                    <td>Dc 4 <br> Parcial 1: {{ alG.dc3p118 }} <br> Parcial 2: {{ alG.dc3p219 }} <br> Parcial 3: {{ alG.dc3p320 }} <br> <strong> Promedio: {{ alG.prom_dc4 }}</strong></td>
+                                                </tr>
+                                                <tr>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>Ap 6 <br> Parcial 1: {{ alG.ap6p1 }} <br> Parcial 2: {{ alG.ap6p2 }} <br> Parcial 3: {{ alG.ap6p3 }} <br> <strong> Promedio: {{ alG.prom_ap6  }}</strong></td>
+                                                </tr>
+                                                <!--Promedio general por semestre-->
+                                                <tr>
+                                                    <td> <strong> Promedio general: {{ alG.prom_general_1 }} </strong></td>
+                                                    <td> <strong> Promedio general: {{ alG.promedio_general_2 }} </strong> </td>
+                                                    <td> <strong> Promedio general: {{ alG.promedio_general_3 }} </strong> </td>
+                                                    <td> <strong> Promedio general: {{ alG.promedio_general_4 }} </strong> </td>
+                                                    <td> <strong> Promedio general: {{ alG.promedio_general_5 }} </strong> </td>
+                                                    <td> <strong> Promedio general: {{ alG.promedio_general_6 }} </strong> </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <br>
+                                        <strong> {{ alG.nombre_alumno }} </strong>
+                                    </div>
+                                {% empty %}
+                                    <div class="alert alert-danger" role="alert">
+                                        <div class="form-row">
+                                            <strong class="col-md-12 text-center">Ningún alumno correspondiente al grupo</strong>
+                                        </div>
+                                        <div class="form-row">
+                                            <p class="col-md-12 text-center">Seleccione un grupo o consúltelo con la institución.</p>
+                                        </div>
+                                    </div>    
+                                {% endfor %}
+                            </div>
+                            
+                        {% endif %}
+                        </div>
+                        <!-- Left and right controls -->
+                        <a class="carousel-control-prev" href="#demo" data-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                        </a>
+                        <a class="carousel-control-next" href="#demo" data-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+      <script>
+        //Funcion para filtrar los alumnos
+        $(document).ready(function(){
+            $("#myInput").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+                $("#listaAlumnos *").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+
+        //Funcion para cuando se selecciona un alumno
+        function seleccionAlumno(){
+            var val = document.getElementById('selectAlumnos').value 
+            document.getElementById('inputAlumno').value = val
+        }
+
+        //Función para quitar valores repetidos de grupos (cct)
+        var optionValues =[];
+        $('#selectGrupo option').each(function(){
+            if($.inArray(this.value, optionValues) >-1){
+                $(this).remove()
+                }else{
+                    optionValues.push(this.value);
+                }
+        });
+
+        //Funcion para cuando se selecciona un grupo
+        function seleccionGrupo(){
+            var sel = document.getElementById('selectGrupo')
+            var val = sel.options[sel.selectedIndex].value
+            document.getElementById('inputGrupo').value = val
+        }
+      </script>    
+{% endblock %}

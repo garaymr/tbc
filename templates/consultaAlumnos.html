@@ -1,0 +1,902 @@
+{% extends 'baseTBC.html'%}
+{% load static %}
+{% block content%}
+    <title>Consulta de alumnos</title>
+    <div class="form-row">
+        <!--Columna izquierda-->
+        <div class="col-md-6 mt-3">
+            <!--Tarjeta de lista de alumnos-->
+            <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="alumnos-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#alumnos" style="cursor:pointer;"><i class="fas fa-users"></i>&nbsp;Alumnos</h5>
+                    </div>
+                    <div class="collapse show" id="alumnos">
+                        <div class="card-text p-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control border border-ligth rounded-left" placeholder="Search" name="buscarAlumno" id="inputAlumno" onkeyup="filtraAlumno();">
+                                <div class="input-group-btn border border-ligth rounded-right">
+                                    <button class="btn btn-default" style="cursor: context-menu;">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <table class="table table-borderless table-hover" id="listaAlumnos" style="height: 250px; display: -moz-groupbox;">
+                                <thead>
+                                  <tr style="width: 100%; display: inline-table; height:60px; table-layout: fixed;">
+                                    <th>#</th>
+                                    <th>Nombre</th>
+                                    <th>Matrícula</th>
+                                  </tr>
+                                </thead>
+                                <tbody style="overflow-y: scroll; height: 200px; width: 95%; position: absolute;">
+                                        {% for al in alumno %}
+                                        {% csrf_token %}
+                                        <tr>
+                                            <th scope="row" style="width: 27%;">{{ forloop.counter }}</th>
+                                            <td style="width: 57.5%;">{{ al.nombre_alumno }}</td>
+                                            <td style="width: 20%;">{{ al.num_matricula }}</td>
+                                            {% for e in estadistica %}
+                                                {% if al.num_matricula == e.num_matricula %}
+                                                    <td><button class="btn btn-outline-info btn-sm" type="submit" onclick="seleccionaAlumno('{{ al.id_alumno }}', '{{ al.nombre_alumno }}', '{{ al.email | default_if_none:'' }}', '{{ al.tel_fijo | default_if_none:'' }}', '{{ al.tel_celular| default_if_none:'' }}', '{{ al.curp_alumno| default_if_none:'' }}', '{{ al.nombre_escuela| default_if_none:'' }}', '{{ al.cct| default_if_none:'' }}', '{{ al.num_matricula| default_if_none:'' }}' , '{{ al.periodo2 | default_if_none:'' }}' , '{{ e.promedio_final | default_if_none:'' }}', '{{ e.prom_general_1 | default_if_none:'' }}', '{{ e.promedio_general_2 | default_if_none:'' }}', '{{ e.promedio_general_3 | default_if_none:'' }}', '{{ e.promedio_general_4 | default_if_none:'' }}', '{{ e.promedio_general_5 | default_if_none:'' }}', '{{ e.promedio_general_6 | default_if_none:'' }}'  , '{{ al.semestre | default_if_none:'' }}', '{{ al.tipo_secundaria | default_if_none:'' }}', '{{ al.beca | default_if_none:'' }}', '{{ al.subsistema_nombre | default_if_none:'' }}'    ); "><i class="far fa-edit"></i></button></td>
+                                                {% endif %}
+                                            {% endfor %}
+                                            {% if usuario.tipo_usuario == "1" %}
+                                                <td><button class="btn btn-outline-danger btn-sm" onclick="confirmDialogDelete('{{ al.id_alumno }}')" style="cursor: pointer;"> <i class="far fa-trash-alt"></i> </button></td>
+                                            {% endif %}
+                                            {% for ar in archivo %}
+                                                {% if ar.id_alumno == al.id_alumno %}
+                                                    {% if ar.tipo_archivo == 'Acta nacimiento' %}
+                                                        <td style="display: none;"><input class="inputsActa" id="inputActa" type="text" value="{{al.id_alumno}}{{ ar.url }}"></td>
+                                                    {% endif %}
+                                                    {% if ar.tipo_archivo == 'Curp' %}
+                                                        <td style="display: none;"><input class="inputsCurp" id="inputCurp" type="text" value="{{al.id_alumno}}{{ ar.url }}"></td>
+                                                    {% endif %}
+                                                    {% if ar.tipo_archivo == 'Certificado secundaria' %}
+                                                        <td style="display: none;"><input class="inputsCertificado" id="inputCertificado" type="text" value="{{al.id_alumno}}{{ ar.url }}"></td>
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </tr>
+                                        {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Tarjeta de resumen de alumno-->
+            <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="resumen-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#resumen" style="cursor:pointer;"><i class="fas fa-archive"></i>&nbsp;Resumen del alumno</h5>
+                    </div>
+                    <div class="collapse show" id="resumen">
+                        <div class="card-text p-2">
+                            <div class="form-row">
+                                <!--Nombres de etiquetas-->
+                                <div class="col-md-6 p-3" style="padding-bottom: 0;">
+                                    <label for=""> Nombre</label>
+                                    <br>
+                                    <label for=""> No. control</label>
+                                    <br>
+                                    <label for=""> Fecha ingreso</label>
+                                    <br>
+                                    <label for=""> Promedio general</label>
+                                    <br>
+                                    <label for=""> Promedio 1er semestre</label>
+                                    <br>
+                                    <label for=""> Promedio 2do semestre</label>
+                                    <br>
+                                    <label for=""> Promedio 3er semestre</label>
+                                    <br>
+                                    <label for=""> Promedio 4to semestre</label>
+                                    <br>
+                                    <label for=""> Promedio 5to semestre</label>
+                                    <br>
+                                    <label for=""> Promedio 6to semestre</label>
+                                </div>
+                                <!--Datos-->
+                                <div class="col-md-6 p-3 text-right" style="padding-bottom: 0;">
+                                    <label id="l_nombre_alumno"> </label>
+                                    <br>
+                                    <label id="l_num_matricula"> </label>
+                                    <br>
+                                    <label id="l_periodo2"> </label>
+                                    <br>
+                                    <label id="l_promedio_final"> </label>
+                                    <br>
+                                    <label id="l_prom_gen_1"></label>
+                                    <br>
+                                    <label id="l_prom_gen_2"> </label>
+                                    <br>
+                                    <label id="l_prom_gen_3"></label>
+                                    <br>
+                                    <label id="l_prom_gen_4"> </label>
+                                    <br>
+                                    <label id="l_prom_gen_5"> </label>
+                                    <br>
+                                    <label id="l_prom_gen_6"> </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mt-3">
+            <form class="needs-validation" novalidate method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+                <!--Tarjeta con formulario del alumno-->
+                <div class="container-flex mb-3" id="wwg-accordian">
+                    <div class="card">
+                        <div class="card-header" id="datos-generales-heading" style="background-color: white;">      
+                            <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#datos-generales" style="cursor:pointer;"><i class="far fa-edit"></i>&nbsp;Datos generales</h5>
+                        </div>
+                        <div class="collapse show" id="datos-generales">
+                            <div class="card-text p-3">
+                                <div class="form-row">
+                                    <input type="text" id="idAlumno" name="idAlumno" hidden>
+                                    <div class="col-md-8 mb-3">
+                                        <label for="nombreAlumno">Nombre completo</label>
+                                        <input type="text" class="form-control border border-ligth" id="nombreAlumno" name="nombreAlumno" placeholder="Nombre" required value="{{ alumnoSel.nombre_alumno | default_if_none:'' }}">
+                                        <div class="invalid-tooltip">
+                                            Por favor introduzca el nombre
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="numMatricula">Matricula</label>
+                                        <input type="text" class="form-control border border-ligth" id="numMatricula" name="numMatricula" placeholder="Matricula" required value="{{ alumnoSel.num_matricula | default_if_none:'' }}">
+                                        <div class="invalid-tooltip">
+                                            Por favor introduzca la matricula
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="curp">CURP</label>
+                                        <input type="text" class="form-control border border-ligth" id="curp" name="curp" placeholder="CURP" required value="{{ alumnoSel.curp_alumno | default_if_none:'' }}">
+                                        <div class="invalid-tooltip">
+                                            Introduzca la CURP
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="telFijo">Teléfono fijo</label>
+                                        <input type="number" class="form-control border border-ligth" id="telFijo" name="telFijo" placeholder="Teléfono fijo" required value="{{ alumnoSel.tel_fijo | default_if_none:'' }}">
+                                        <div class="invalid-tooltip">
+                                            Introduzca el teléfono
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="telCelular">Teléfono celular</label>
+                                        <input type="number" class="form-control border border-ligth" id="telCelular" name="telCelular" placeholder="Teléfono celular" required value="{{ alumnoSel.tel_celular | default_if_none:'' }}">
+                                        <div class="invalid-tooltip">
+                                            Introduzca el número de celular
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="calle">Tipo de secundaria</label>
+                                        <select class="selectpicker" data-live-search="true" title="Seleccione..." data-width="100%" onchange="seleccionaSecundaria();" id="selectSecundaria">
+                                            <option>Telesecundaria</option>
+                                            <option>General</option>
+                                            <option>Técnica</option>
+                                            <option>INEA</option>
+                                        </select>
+                                        <input type="text" hidden name="tipo_secundaria" id="tipo_secundaria">                                          
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="colonia">Acta de nacimiento</label>
+                                        <div class="form-row">
+                                            <div class="col-md-6">
+                                                <input type="file" name="acta" id="inputActaF" style="display: none;" />
+                                                <button id="btnActaArchivo" type="button" class="btn btn-outline-primary btn-block" onclick="document.getElementById('inputActaF').click();"><i class="fas fa-upload"></i></button>
+                                                <!-- <input type="button" value="Buscar..." class="btn btn-outline-primary btn-block" onclick="document.getElementById('inputActa').click();" /> -->
+                                            </div>
+                                            <div class="col-md-6">
+                                                <a id="btnActa" type="button" class="btn btn-warning btn-block" style="color: white;" target="_blank"><i class="fas fa-eye"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label for="curpArchivo">CURP</label><br>
+                                        <div class="form-row">
+                                            <div class="col-md-6">
+                                                <input type="file" name="curpArchivo" id="inputCURP" style="display: none;" />
+                                                <button id="btnCurpArchivo" type="button" class="btn btn-outline-primary btn-block" onclick="document.getElementById('inputCURP').click();"><i class="fas fa-upload"></i></button>
+                                                <!-- <input type="button" value="B" class="btn btn-outline-primary " onclick="document.getElementById('inputCURP').click();" /> -->
+                                            </div>
+                                            <div class="col-md-6">
+                                                <a id="btnCurp" type="button" class="btn btn-warning btn-block" style="color: white;" target="_blank"><i class="fas fa-eye"></i></a>   
+                                            </div>
+                                        </div>                              
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="numExt">Certificado secundaria</label>
+                                        <div class="form-row">
+                                            <div class="col-md-6">
+                                                <input type="file" name="certificado" id="inputCertificadoF" style="display: none;" />
+                                                <button id="btnCertificadoArchivo" type="button" class="btn btn-outline-primary btn-block" onclick="document.getElementById('inputCertificadoF').click();"><i class="fas fa-upload"></i></button>
+                                                <!-- <input type="button" value="Buscar..." class="btn btn-outline-primary btn-block" onclick="document.getElementById('inputCertificado').click();" /> -->
+                                            </div>
+                                            <div class="col-md-6">
+                                                <a id="btnCertificado" type="button" class="btn btn-warning btn-block" style="color: whitesmoke;" target="_blank"><i class="fas fa-eye"></i></a>  
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Tarjeta datos institucionales-->
+                <div class="container-flex mb-3" id="wwg-accordian">
+                    <div class="card">
+                        <div class="card-header" id="datos-institucionales-heading" style="background-color: white;">      
+                            <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#datos-institucionales" style="cursor:pointer;"><i class="fas fa-school"></i>&nbsp;Datos institucionales</h5>
+                        </div>
+                        <div class="collapse show" id="datos-institucionales">
+                            <div class="card-text p-3">
+                                <div class="form-row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="semestre">Semestre</label>
+                                        <input type="number" class="form-control border border-ligth" id="semestre" name="semestre" placeholder="Semestre" required value="{{ alumnoSel.semestre | default_if_none:'' }}">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="nombreEscuela">Nombre de la institución</label>
+                                        <input type="text" class="form-control border border-ligth" id="nombreEscuela" name="nombreEscuela" placeholder="Nombre de la institución" required value="{{ alumnoSel.nombre_escuela | default_if_none:'' }}">
+                                        <div class="invalid-tooltip">
+                                            Introduzca el nombre
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="cct">CCT</label>
+                                        <input type="text" class="form-control border border-ligth" id="cct" name="cct" placeholder="CCT" required >
+                                        <div class="invalid-tooltip">
+                                            Introduzca el CCT
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-2 mb-3">
+                                        <label for="nss">Solicitar NSS</label><br>
+                                        <button class="btn btn-outline-primary btn-block" type="button" id="btnNss" onclick="solicitarNss();">Solicitar</button>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="beca">¿Cuenta con beca?</label>
+                                        <select name="beca" id="selectBeca" class="selectpicker" data-live-search="true" title="Seleccione..." data-width="100%" onchange="seleccionaBeca();" required>
+                                            <option value="si">Sí</option>
+                                            <option value="no">No</option>
+                                        </select>
+                                        <input type="text" hidden name="beca" id="beca">   
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <a for="subsistema" data-toggle="tooltip" title="Llenar sólo en caso de ser necesario">Subsistema proveniente</a>
+                                        <input style="margin-top: 0.5em;" type="text" class="form-control border border-ligth" id="subsistema_nombre" name="subsistema_nombre" placeholder="Subsistema" >
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="subsistemaF">Subir equivalencia</label>
+                                        <div class="form-row">
+                                            <div class="col-md-6 mb-3">
+                                                <input type="file" name="subsistema" id="inputSubsistema" style="display: none;" />
+                                                <button id="btnSubsistemaF" type="button" class="btn btn-outline-primary btn-block" onclick="document.getElementById('inputSubsistema').click();"><i class="fas fa-upload"></i></button>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <a id="btnSubsistema" type="button" class="btn btn-warning btn-block" style="color: white;" target="_blank"><i class="fas fa-eye"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if usuario.tipo_usuario == "6" %}
+                                    <div style="line-height: 280%;">
+                                        <br>
+                                    </div>
+                                {% endif %}
+                                <!-- Campos para insertar en CustomUser -->
+                                <div class="form-row">
+                                    <div class="col-md-12">
+                                        <div class="alert alert-warning" role="alert">
+                                            <div class="form-row">
+                                                <strong class="col-md-12">Campos para el inicio de sesión en la plataforma</strong>
+                                            </div>
+                                            <div class="form-row">
+                                                <div class="col-md-4 mb-3">
+
+                                                    <label for="email">Email</label>
+                                                    <input type="email" class="form-control border border-ligth" id="email" name="email" placeholder="Email" required value="{{ alumnoSel.email | default_if_none:'' }}">
+                                                    <div class="invalid-tooltip">
+                                                        Introduzca su email
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-md-8 mb-3">
+                                                    <label for="password">Contraseña</label>
+                                                    <input type="text" class="form-control border border-ligth" id="contrasena" name="contrasena" placeholder="Contraseña" required  minlength="8">
+                                                </div>
+                                            </div>
+                                        </div>  
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    {% if usuario.tipo_usuario == "1" %}
+                                        <a class="btn btn-outline-success btn-block" onclick="confirmDialog()" style="cursor: pointer;">Guardar</a>
+                                        <button class="btn btn-outline-success btn-block" hidden type="submit" id="btnGuardar"></button></button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-12">
+            <div class="form-row">
+                <div class="col-md-12">
+                    <!--Tarjeta de gráfico 2-->
+                    <div class="container-flex" id="wwg-accordian">
+                        <div class="card">
+                            <div class="card-header" id="modulo-heading" style="background-color: white;">      
+                                <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#modulo" style="cursor:pointer;"><i class="fas fa-chart-bar"></i>&nbsp;Reporte por módulos</h5>
+                            </div>
+                            <div class="collapse show" id="modulo">
+                                <div class="card-text p-3">
+                                    <canvas id="myChart" width="800" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-row">
+        <!--Columna derecha-->
+        <div class="col-md-6 mt-3">
+            <!--Tarjeta de mis cursos-->
+            <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="modulos-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#modulos" style="cursor:pointer;"><i class="far fa-file-alt"></i>&nbsp;Módulos</h5>
+                    </div>
+                    <div class="collapse show" id="modulos">
+                        <div class="card-text p-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control border border-ligth rounded-left" placeholder="Search" name="buscarModulo" id="inputModulo" onkeyup="filtraModulo();">
+                                <div class="input-group-btn border border-ligth rounded-right">
+                                    <button class="btn btn-default" style="cursor: context-menu;">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <table class="table table-borderless table-hover" id="listaModulo" style="height: 357px; display: -moz-groupbox;">
+                                <thead>
+                                  <tr style="width: 100%; display: inline-table; height:60px; table-layout: fixed;">
+                                    <th style="width: 5%;">#</th>
+                                    <th style="width: 5.8%;">Nombre</th>
+                                    <th style="width: 3.5%;">Semestre</th>
+                                    <th style="width: 5%;">Créditos</th>
+                                  </tr>
+                                </thead>
+                                <tbody style="overflow-y: scroll; height: 307px; width: 95%; position: absolute;">
+                                        {% if usuario.tipo_usuario == "1" %}
+                                            {% for modulo in modulo %}
+                                                <tr>
+                                                    <td style="width: 5%">{{ forloop.counter }}</td>
+                                                    <td style="width: 60%;">{{ modulo.nombre_modulo }}</td>
+                                                    <td style="width: 15%;">{{ modulo.semestre_modulo_id }}</td>
+                                                    <td style="width: 15%;">{{ modulo.creditos_modulo }}</td>
+                                                    <td ><button class="btn btn-outline-warning btn-sm" onclick="graficoModulo('{{ modulo.id_modulo }}');"><i class="far fa-eye"></i></button></td>
+                                                </tr>
+                                            {% endfor %}
+                                        {% endif %}
+                                        <!-- Usuario: docente (6) -->
+                                        {% if usuario.tipo_usuario == "6" %} 
+                                            {% for modulo in modulosDocente %}
+                                                <tr>
+                                                    <td style="width: 5%">{{ forloop.counter }}</td>
+                                                    <td style="width: 60%;">{{ modulo.nombre_modulo }}</td>
+                                                    <td style="width: 15%;">{{ modulo.semestre_modulo_id }}</td>
+                                                    <td style="width: 15%;">{{ modulo.creditos_modulo }}</td>
+                                                    <td ><button class="btn btn-outline-warning btn-sm" onclick="graficoModulo('{{ modulo.id_modulo }}');"><i class="far fa-eye"></i></button></td>
+                                                </tr>
+                                            {% endfor %}
+                                        {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mt-3">
+            <!--Tarjeta de Gráfico 1-->
+            <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="grafico1-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#grafico1" style="cursor:pointer;"><i class="fas fa-chart-pie"></i>&nbsp;Índice de reprobación por módulos</h5>
+                    </div>
+                    <div class="collapse show" id="grafico1">
+                        <div class="card-text p-3">
+                            <canvas id="myChart2" width="350" height="201"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var usuarioA = {% autoescape off %}{{ usuario.tipo_usuario }}{% endautoescape %}
+        if(usuarioA === 6 ){
+            //Funcion para filtrar la data de la grafica de indice de repro
+            //Se comprueba si el usuario activo es un docente -> if
+            var dataAux = {% autoescape off %}{{ data3 }}{% endautoescape %}
+            var labelsAux = {% autoescape off %}{{ labels3 }}{% endautoescape %}
+            var data3 = []
+            var labels3 = []
+            //Con la info de auxData3 y auxLabels3 se filtrará la info con los modulos que le pertenezcan al docente
+            var indices = {% autoescape off %}{{ indices3 }}{% endautoescape %} //indices contiene los indices de todos los modulos con indice de reprobacion
+            //Se procede a comparar los indices con los indices de los modulos que imparte el docente
+            var indicesDocente = {% autoescape off %}{{ indicesDocente }}{% endautoescape %} //indicesDocente contiene los indices de los modulos que imparte el docente
+            console.log(indices)
+            console.log(indicesDocente)
+            for(var i = 0; i < indices.length; i++){
+                for(var j = 0; j < indicesDocente.length; j++){
+                    if (indices[i] === indicesDocente[j]){
+                        data3.push(dataAux[i])
+                        labels3.push(labelsAux[i])
+                        //console.log('entro')
+                    }
+                }
+            }
+        }else{
+            //Si no es docente entonces data3 y labels3 toman su valor original sin alterarlo
+            var data3= {% autoescape off %}{{ data3 }}{% endautoescape %}
+            var labels3 = {% autoescape off %}{{ labels3 }}{% endautoescape %}
+        }
+
+        //Funcion cuando selecciona una secundaria
+        function seleccionaSecundaria(){
+            var sel = document.getElementById('selectSecundaria')
+            var val = sel.options[sel.selectedIndex].value
+            document.getElementById('tipo_secundaria').value = val
+        }
+
+        //Funcion para cuando se selecciona una beca
+        function seleccionaBeca(){
+            var sel = document.getElementById('selectBeca')
+            var val = sel.options[sel.selectedIndex].value
+            document.getElementById('beca').value = val
+        }
+
+        //Funcion para filtrar alumnos
+        function filtraAlumno() {
+        // Declare variables 
+            var input, filter, table, tr, td, i;
+            input = document.getElementById("inputAlumno");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("listaAlumnos");
+            tr = table.getElementsByTagName("tr");
+
+            // Loop through all table rows, and hide those who don't match the search query
+            for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[0]; //La posición del arreglo indica el campo que se buscará
+                if (td) {
+                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                } 
+            }
+        }
+
+        //Funcion cuando se selecciona un alumno
+        function seleccionaAlumno(idAlumno, nombreAlumno, email, telFijo, telCelular, curp, nombreEscuela, cct, numMatricula, fechaIngreso, promGeneral, prom_general_1, 
+        prom_general_2, prom_general_3, prom_general_4, prom_general_5, prom_general_6, semestre, tipo_secundaria, beca, subsistema_nombre){
+            inputs = document.getElementsByClassName('inputsActa');
+            inputsC = document.getElementsByClassName('inputsCurp');
+            inputsCS = document.getElementsByClassName('inputsCertificado');
+            bandera = false;
+            for(var i = 0; i < inputs.length; i++){
+                urlActa = inputs[i].value
+                urlCurp = inputsC[i].value
+                urlCertificado = inputsCS[i].value
+                idAlumnoArchivo = inputs[i].value.slice(0, 1);
+                if(idAlumno == idAlumnoArchivo){
+                    //Si hay archivo y se puede ver (blouear boton de subir)
+                    bandera = true;
+                    urlActa = urlActa.substring(1, urlActa.lenght);
+                    urlCurp = urlCurp.substring(1, urlCurp.lenght);
+                    urlCertificado = urlCertificado.substring(1, urlCertificado.lenght);
+
+                    document.getElementById('btnActa').target = "_blank";
+                    document.getElementById('btnActaArchivo').className = 'btn btn-outline-secondary btn-block'
+                    document.getElementById('btnActaArchivo').disabled = true;
+                    document.getElementById('btnActa').className = 'btn btn-warning btn-block'
+                    document.getElementById('btnActa').style.cursor = 'pointer'
+
+                    document.getElementById('btnCurp').target = "_blank";
+                    document.getElementById('btnCurpArchivo').className = 'btn btn-outline-secondary btn-block'
+                    document.getElementById('btnCurpArchivo').disabled = true;
+                    document.getElementById('btnCurp').className = 'btn btn-warning btn-block'
+                    document.getElementById('btnCurp').style.cursor = 'pointer'
+
+                    document.getElementById('btnCertificado').target = "_blank";
+                    document.getElementById('btnCertificadoArchivo').className = 'btn btn-outline-secondary btn-block'
+                    document.getElementById('btnCertificadoArchivo').disabled = true;
+                    document.getElementById('btnCertificado').className = 'btn btn-warning btn-block'
+                    document.getElementById('btnCertificado').style.cursor = 'pointer'
+
+                    document.getElementById('btnSubsistema').target = "_blank";
+                    document.getElementById('btnSubsistemaF').className = 'btn btn-outline-secondary btn-block'
+                    document.getElementById('btnSubsistemaF').disabled = true;
+                    document.getElementById('btnSubsistema').className = 'btn btn-warning btn-block'
+                    document.getElementById('btnSubsistema').style.cursor = 'pointer'
+
+                    //Dont touch this
+                    document.getElementById('btnActa').href = urlActa;
+                    document.getElementById('btnCurp').href = urlCurp;
+                    document.getElementById('btnCertificado').href = urlCertificado;
+                    document.getElementById('btnSubsistema').href = urlCertificado;
+                }
+                if(!bandera){
+                    //No hay un archivo y no se puede ver (bloquear el <a> de ver)
+                    document.getElementById('btnActa').href = '#';
+                    document.getElementById('btnActa').removeAttribute('target');
+                    document.getElementById('btnActaArchivo').className = 'btn btn-outline-primary btn-block'
+                    document.getElementById('btnActaArchivo').disabled = false;
+                    document.getElementById('btnActa').className = 'btn btn-secondary btn-block'
+                    document.getElementById('btnActa').style.cursor = 'default'
+
+                    document.getElementById('btnCurp').href = '#';
+                    document.getElementById('btnCurp').removeAttribute('target');
+                    document.getElementById('btnCurpArchivo').className = 'btn btn-outline-primary btn-block'
+                    document.getElementById('btnCurpArchivo').disabled = false;
+                    document.getElementById('btnCurp').className = 'btn btn-secondary btn-block'
+                    document.getElementById('btnCurp').style.cursor = 'default'
+
+                    document.getElementById('btnCertificado').href = '#';
+                    document.getElementById('btnCertificado').removeAttribute('target');
+                    document.getElementById('btnCertificadoArchivo').className = 'btn btn-outline-primary btn-block'
+                    document.getElementById('btnCertificadoArchivo').disabled = false;
+                    document.getElementById('btnCertificado').className = 'btn btn-secondary btn-block'
+                    document.getElementById('btnCertificado').style.cursor = 'default'
+
+                    document.getElementById('btnSubsistema').href = '#';
+                    document.getElementById('btnSubsistema').removeAttribute('target');
+                    document.getElementById('btnSubsistemaF').className = 'btn btn-outline-primary btn-block'
+                    document.getElementById('btnSubsistemaF').disabled = false;
+                    document.getElementById('btnSubsistema').className = 'btn btn-secondary btn-block'
+                    document.getElementById('btnSubsistema').style.cursor = 'default'
+                    
+
+                }
+            }
+            
+            var x = document.getElementsByClassName('inputAlumno');
+            for(i = 0; i < x.length; i++) {
+                x[i].value = idAlumno;
+            }
+            var idAlumnoA = document.getElementById('idAlumno');
+            idAlumnoA.value = idAlumno;
+
+            //Asignación a los inputs de los datos del alumno seleccionado
+            var nombreA = document.getElementById('nombreAlumno');
+            var emailA = document.getElementById('email');
+            var telFijoA = document.getElementById('telFijo');
+            var telCelularA = document.getElementById('telCelular');
+            var curpA = document.getElementById('curp');
+            var nombreEscuelaA = document.getElementById('nombreEscuela');
+            var cctA = document.getElementById('cct');
+            var numMatriculaA = document.getElementById('numMatricula');
+            var semestreA = document.getElementById('semestre');
+            var tipo_secundariaA = document.getElementById('tipo_secundaria');
+            var becaA = document.getElementById('beca');
+            var subsistema_nombreA = document.getElementById('subsistema_nombre');
+            nombreA.value = nombreAlumno;
+            emailA.value = email;
+            telFijoA.value = telFijo;
+            telCelularA.value = telCelular;
+            curpA.value = curp;
+            nombreEscuelaA.value = nombreEscuela;
+            cctA.value = cct;
+            numMatriculaA.value = numMatricula;
+            semestreA.value = semestre;
+            tipo_secundariaA.value = tipo_secundaria;
+            becaA.value = beca;
+            subsistema_nombreA.value = subsistema_nombre;
+            $('#selectSecundaria').selectpicker('val', tipo_secundaria);
+            $('#selectBeca').selectpicker('val', beca);
+
+            //Asignación a los labels del resumen del alumno
+            var nombreA_l = document.getElementById('l_nombre_alumno');
+            var numMatriculaA_l = document.getElementById('l_num_matricula');
+            var fechaIngreso_l = document.getElementById('l_periodo2');
+            var promedioGeneral_l = document.getElementById('l_promedio_final');
+            var promedio_general_2_l = document.getElementById('l_prom_gen_1');
+            var promedio_general_2_2 = document.getElementById('l_prom_gen_2');
+            var promedio_general_2_3 = document.getElementById('l_prom_gen_3');
+            var promedio_general_2_4 = document.getElementById('l_prom_gen_4');
+            var promedio_general_2_5 = document.getElementById('l_prom_gen_5');
+            var promedio_general_2_6 = document.getElementById('l_prom_gen_6');
+            nombreA_l.textContent = nombreAlumno;
+            numMatriculaA_l.textContent = numMatricula;
+            fechaIngreso_l.textContent = fechaIngreso;
+            promedioGeneral_l.textContent = promGeneral;
+            promedio_general_2_l.textContent = prom_general_1;
+            promedio_general_2_2.textContent = prom_general_2;
+            promedio_general_2_3.textContent = prom_general_3;
+            promedio_general_2_4.textContent = prom_general_4;
+            promedio_general_2_5.textContent = prom_general_5;
+            promedio_general_2_6.textContent = prom_general_6;
+        }
+
+        //Funcion para un alert de confirmacion
+        function confirmDialog(){
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: "Confirme si desea realizar la acción",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Confirmar'
+            }).then((result) => {
+                if (result.value) {
+                    document.getElementById('btnGuardar').click();
+                }
+                })
+        }
+
+        //Función al dar click al eliminar alumno
+        function confirmDialogDelete(id){
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: "Confirme si desea realizar la acción",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Confirmar'
+            }).then((result) => {
+                if (result.value) {
+                    window.location.replace('delete-alumno/'+id);
+                }
+                })
+        }
+
+        //Función para filtrar los moduos de la tabla
+        function filtraModulo() {
+        // Declare variables 
+            var input, filter, table, tr, td, i;
+            input = document.getElementById("inputModulo");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("listaModulo");
+            tr = table.getElementsByTagName("tr");
+
+            // Loop through all table rows, and hide those who don't match the search query
+            for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[1]; //La posición del arreglo indica el campo que se buscará
+                if (td) {
+                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                } 
+            }
+        }
+
+        //Gráfica de reporte general (todos los modulos)
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {% autoescape off %}{{ labels }}{% endautoescape %},//['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17'],
+                datasets: [{
+                    label: 'Promedio por módulo',
+                    data: {% autoescape off %}{{ data }}{% endautoescape %}, //[8.3, 7.0, 7.0, 7.0, 6.0, 7.0, 8.3, 8.0, 8.0, 7.0, 7.8, 9.6, 6.7, 8.9, 6.4, 9.9, 9.6],
+                    backgroundColor: [
+                        '#ff4500','#da70d6','#eee8aa','#98fb98',
+                        '#afeeee','#db7093','#ffefd5','#ffdab9',
+                        '#cd853f','#ffc0cb','#dda0dd','#b0e0e6',
+                        '#800080','#ff0000','#bc8f8f','#fa8072',
+                        '#f4a460'
+                    ],
+                    borderColor: [],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        fontColor: "#000000",
+                    }
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }],
+                    xAxes: [{
+                        barPercentage: 0.5
+                    }]
+                }
+            }
+        });
+        //Gráfica de pastel de indice de reprobacion
+        
+        new Chart(document.getElementById("myChart2"), {
+            type: 'pie',
+            data: {
+            labels: labels3,
+            datasets: [{
+                label: "índice de reprobación",
+                backgroundColor: ['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6', 
+                '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
+                '#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A', 
+                '#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC',
+                '#66994D', '#B366CC', '#4D8000', '#B33300', '#CC80CC', 
+                '#66664D', '#991AFF', '#E666FF', '#4DB3FF', '#1AB399',
+                '#E666B3', '#33991A', '#CC9999', '#B3B31A', '#00E680', 
+                '#4D8066', '#809980', '#E6FF80', '#1AFF33', '#999933',
+                '#FF3380', '#CCCC00', '#66E64D', '#4D80CC', '#9900B3', 
+                '#E64D66', '#4DB380', '#FF4D4D', '#99E6E6', '#6666FF'],
+                data: data3
+            }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Módulos con mayor índice de reprobación'
+                },
+                tooltips: {
+                    callbacks: {
+                    label: function(tooltipItem, data) {
+                        var dataset = data.datasets[tooltipItem.datasetIndex];
+                        var meta = dataset._meta[Object.keys(dataset._meta)[0]];
+                        var total = {% autoescape off %}{{ totalAlumnos }}{% endautoescape %};
+                        var currentValue = dataset.data[tooltipItem.index];
+                        var percentage = parseFloat((currentValue/total*100).toFixed(1));
+                        return currentValue + ' (' + percentage + '%)';
+                    },
+                    title: function(tooltipItem, data) {
+                        return data.labels[tooltipItem[0].index];
+                    }
+                    }
+                },
+            }
+        });
+
+        //Funcion para cuando se selecciona un modulo para ver su gráfico
+        function graficoModulo(id_modulo){
+            var lista = {% autoescape off %}{{ data2 }}{% endautoescape %}
+            var labels2 = {% autoescape off %}{{ labels2 }}{% endautoescape %}
+            data = []
+            switch(id_modulo){
+                case '1':
+                    data = lista[0]
+                    break;
+                case '2':
+                    data = lista[1]
+                    break;
+                case '3':
+                    data = lista[2]
+                    break;
+                case '4':
+                    data = lista[3]
+                    break;
+                case '5':
+                    data = lista[4]
+                    break;
+                case '6':
+                    data = lista[5]
+                    break;
+                case '7':
+                    data = lista[6]
+                    break;
+                case '8':
+                    data = lista[7]
+                    break;
+                case '9':
+                    data = lista[8]
+                    break;
+                case '10':
+                    data = lista[9]
+                    break;
+                case '11':
+                    data = lista[10]
+                    break;
+                case '12':
+                    data = lista[11]
+                    break;
+                case '13':
+                    data = lista[12]
+                    break;
+                case '14':
+                    data = lista[13]
+                    break;
+                case '15':
+                    data = lista[14]
+                    break;
+                case '16':
+                    data = lista[15]
+                    break;
+                case '17':
+                    data = lista[16]
+                    break;
+            }
+            updateConfigAsNewObject(myChart, data, labels2);
+        }
+        
+        //Funcion para actualizar la grafica seleccionada
+        function updateConfigAsNewObject(chart, newData, labels2) {
+            chart.data = {
+                labels: labels2,
+                datasets: [{
+                    label: 'Número de alumnos por rango de promedios',
+                    data: newData,
+                    backgroundColor: [
+                    '#E666B3', '#33991A', '#CC9999', '#B3B31A', '#00E680', 
+                    '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
+                    '#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A', 
+                    '#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC',
+                    '#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6', 
+                    '#66994D', '#B366CC', '#4D8000', '#B33300', '#CC80CC', 
+                    '#66664D', '#991AFF', '#E666FF', '#4DB3FF', '#1AB399',
+                    '#E666B3', '#33991A', '#CC9999', '#B3B31A', '#00E680', 
+                    '#4D8066', '#809980', '#E6FF80', '#1AFF33', '#999933',
+                    '#FF3380', '#CCCC00', '#66E64D', '#4D80CC', '#9900B3', 
+                    '#E64D66', '#4DB380', '#FF4D4D', '#99E6E6', '#6666FF'
+                    ],
+                    borderColor: [],
+                    borderWidth: 1
+                }]
+            }
+            chart.options = {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        fontColor: "#000000",
+                    }
+                },
+                scales: {
+                    xAxes: [{
+                        barPercentage: 0.4
+                    }]
+                }
+            }
+            chart.update();
+        }
+        
+        //Se cambian los id de los modulos por sus nombres correspondientes
+        var rows = document.getElementsByTagName("table")[0].rows;
+        var last = rows[rows.length - 1];
+        var cell = last.cells[0];
+        var value = cell.innerHTML;
+
+        //Sweetalert para nss
+        function solicitarNss(){
+            Swal.fire({
+                title: 'Ten a la mano lo siguiente:',
+                text: "¡CURP y tu correo electrónico!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ok, ¡llévame ahí!'
+                }).then((result) => {
+                if (result.isConfirmed) {
+                    window.open('https://serviciosdigitales.imss.gob.mx/gestionAsegurados-web-externo/asignacionNSS', '_blank');
+                }
+                })
+        }
+
+    </script>
+    
+{% endblock %}

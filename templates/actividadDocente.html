@@ -1,0 +1,369 @@
+{% extends 'baseTBC.html'%}
+{% load static %}
+{% block content%}
+    <title>Actividad: {{ actividad.nombre_actividad }}</title>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-row">
+            <!--Columna izquierda-->
+            <div class="col-md-7 mt-3">
+                <!--Tarjeta de nueva actividad-->
+                <div class="container-flex mb-3" id="wwg-accordian">
+                    <div class="card">
+                        <div class="card-header" id="nueva-actividad-heading" style="background-color: white;">      
+                            <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#nueva-actividad" style="cursor:pointer;"><i class="far fa-file-alt"></i>&nbsp;{{ actividad.nombre_actividad }}</h5>
+                        </div>
+                        <div class="collapse show" id="nueva-actividad">
+                            <div class="card-text p-3">
+                                <h6>Matemáticas 1</h6>
+                                <div class="form-row">
+                                    <input type="text" id="idActividad" name="idActividad" hidden>
+                                    <div class="col-md-8 mb-3">
+                                        <label for="nombreActividad">Nombre de la actividad</label>
+                                        <input type="text" class="form-control border border-ligth" id="nombreActividad" name="nombreActividad" placeholder="Nombre" required value="{{ actividad.nombre_actividad }}">
+                                        <div class="invalid-tooltip">
+                                            Por favor introduzca el nombre
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="unidad">Unidad</label>
+                                        <input type="unidad" class="form-control border border-ligth" id="unidad" name="unidad" placeholder="unidad" required value="{{ actividad.unidad }}">
+                                        <div class="invalid-tooltip">
+                                            Introduzca la unidad
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="tipoActividad">Tipo de actividad</label>
+                                        <input type="text" class="form-control border border-ligth" id="tipoActividad" name="tipoActividad" placeholder="Tipo actividad" required value="{{ actividad.tipo_actividad }}">
+                                        <div class="invalid-tooltip">
+                                            Introduzca el tipo
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="tema">Tema</label>
+                                        <input type="text" class="form-control border border-ligth" id="tema" name="tema" placeholder="Tema" required value="{{ actividad.tema }}">
+                                        <div class="invalid-tooltip">
+                                            Introduzca el tema
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="subtema">Subtema</label>
+                                        <input type="text" class="form-control border border-ligth" id="subtema" name="subtema" placeholder="subtema" required value="{{ actividad.subtema }}">
+                                        <div class="invalid-tooltip">
+                                            Introduzca el subtema
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="objetivo">Objetivo</label>
+                                        <input type="text" class="form-control border border-ligth" id="objetivoActividad" name="objetivoActividad" placeholder="Objetivo" required value="{{ actividad.objetivo }}">
+                                        <!-- <div class="form-group">
+                                            <label for="objetivoActividad">Objetivo de la activdad</label>
+                                            <textarea class="form-control border border-ligth" name="objetivoActividad" rows="1"></textarea>
+                                        </div> -->
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="fecha">Fecha de registro</label>
+                                        <input type="text" class="form-control border border-ligth text-center" value="{{ actividad.fechaAct }}" disabled>
+                                    </div>
+                                </div>    
+                                <div class="form-row">
+                                    <label>Archivos subidos</label>
+                                    <table class="table table-hover table-borderless" style="height: 150px; display: -moz-groupbox;">
+                                        <thead>
+                                            <tr style="width: 80%; display: inline-table; height:60px; table-layout: fixed;">
+                                                <th scope="col">#</th>
+                                                <th scope="col">Nombre</th>
+                                                <th scope="col">Descripción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody style="overflow-y: scroll; height: 100px; width: 95%; position: absolute;">
+                                            {% for ar in archivo %}
+                                            {% csrf_token %}
+                                                {% if ar.tipo_archivo == 'Recurso' %}
+                                                    <tr>
+                                                        <th scope="row">{{ forloop.counter }}</th>
+                                                        <td style="width: 60%;">{{ ar.nombre_archivo }}</td>
+                                                        <td style="width: 40%;">{{ ar.descripcion }}</td>
+                                                        <td><a class="btn btn-outline-primary btn-sm" href="{{ ar.url }}" target="_blank"><i class="far fa-eye"></i></a></td>
+                                                        <td><a class="btn btn-danger btn-sm" style="cursor: pointer; color: white;" onclick="confirmDialogDelete('{{ actividad.id_actividad }}','{{ ar.tipo_archivo}}', '{{ ar.nombre_archivo }}')" style="cursor: pointer;"> <i class="far fa-trash-alt"></i> </a></td>
+                                                    </tr>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-12 mb-3">
+                                        <br>
+                                        <label for="recurso">Seleccione el recurso para la actividad</label>
+                                        <br>
+                                        <input type="file" name="recurso" id="inputRecursos" multiple onclick="limpiaInputsRecursos();">
+                                    </div>
+                                </div>
+                                <div class="form-row" id="form-row">
+                                    <div class="col-md-12 mb-3" id="divInputsRecursos">
+ 
+                                    </div>
+                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Columna derecha-->
+            <div class="col-md-5 mt-3">
+                <!--Tarjeta con formulario de configuración-->
+                <div class="container-flex mb-3" id="wwg-accordian">
+                    <div class="card">
+                        <div class="card-header" id="configuracion-heading" style="background-color: white;">      
+                            <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#configuracion" style="cursor:pointer;"><i class="fas fa-sliders-h"></i>&nbsp;Configuración</h5>
+                        </div>
+                        <div class="collapse show" id="configuracion">
+                            <div class="card-text p-3">
+                                <div class="form row">
+                                    <div class="col-md-12 mb-3">
+                                        <div class="card-text ">
+                                            {% for doc in docente %}
+                                                <h7>Docente:  {{ doc.nombres_docente }} {{ doc.apellidos_docente }}</h7>
+                                                <br>
+                                                Periodo: Ene - Ago 2020
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row mb-3">
+                                    <label>Rúbricas subidas</label>
+                                    <table class="table table-hover table-borderless" style="height: 150px; display: -moz-groupbox;">
+                                        <thead>
+                                            <tr style="width: 80%; display: inline-table; height:60px; table-layout: fixed;">
+                                                <th scope="col">#</th>
+                                                <th scope="col">Nombre</th>
+                                                <th scope="col">Descripción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody style="overflow-y: scroll; height: 100px; width: 95%; position: absolute;">
+                                            {% for ar in archivo %}
+                                            {% csrf_token %}
+                                            {% if ar.tipo_archivo == 'Rubrica' %}
+                                                <tr>
+                                                    <th scope="row">{{ forloop.counter }}</th>
+                                                    <td style="width: 60%;">{{ ar.nombre_archivo }}</td>
+                                                    <td style="width: 40%">{{ ar.descripcion }}</td>
+                                                    <td><a class="btn btn-outline-primary btn-sm" href="{{ ar.url }}" target="_blank"><i class="far fa-eye"></i></a></td>
+                                                    <td><a class="btn btn-danger btn-sm" style="cursor: pointer; color: white;" onclick="confirmDialogDelete('{{ actividad.id_actividad }}','{{ ar.tipo_archivo }}', '{{ ar.nombre_archivo }}')" style="cursor: pointer;"> <i class="far fa-trash-alt"></i> </a></td>
+                                                </tr>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="recurso">Seleccione la rúbrica para la actividad</label>
+                                        <br>
+                                        <input type="file" name="rubrica" id="inputRubricas" multiple onclick="limpiaInputsRubricas();">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-12 mb-3" id="divInputsRubricas">
+
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="valorActividad">Valor en el parcial</label>
+                                        <div class="input-group mb-3">
+                                            <input type="number" class="form-control border border-ligth" name="valorActividad" placeholder="Valor en el parcial" aria-label="Valor en el parcial" aria-describedby="basic-addon2" value="{{ actividad.valor_parcial }}">
+                                            <div class="input-group-append">
+                                            <span class="input-group-text" id="basic-addon2">%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row mb-1">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="fechaHoraLimite">Fecha y hora límite</label> <br>
+                                        <input id="datetimepicker" type="text" class="form-control border border-ligth" name="fechaHoraLimite" autocomplete="off" value="{{ actividad.fecha_hora_limite }}">
+                                        <script>
+                                            jQuery('#datetimepicker').datetimepicker();
+                                            jQuery.datetimepicker.setLocale('es');
+                                            jQuery('#datetimepicker').datetimepicker({
+                                                format:'d/m/Y H:i',
+                                                step:30
+                                                });
+                                        </script>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <a class="btn btn-outline-info btn-block" onclick="confirmDialog()" style="cursor: pointer;">Actualizar</a>
+                                    <button class="btn btn-outline-success btn-block" hidden type="submit" id="btnGuardar"></button></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="form-row">
+        <div class="col-md-12 mb-3">
+            <!--Tarjeta entregas-->
+            <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="entregas-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#entregas" style="cursor:pointer;"><i class="far fa-check-square"></i>&nbsp;Entregas</h5>
+                    </div>
+                    <div class="collapse" id="entregas">
+                        <div class="card-text p-3">
+                            <table class="table table-borderless " id="listaAlumnos" style="height: 287px; display: -moz-groupbox;">
+                                <thead>
+                                  <tr style="width: 100%; display: inline-table; height:60px; table-layout: fixed;">
+                                    <th>#</th>
+                                    <th>Nombre</th>
+                                    <th>Matrícula</th>
+                                    <th>Subida</th>
+                                    <th>Archivo</th>
+                                  </tr>
+                                </thead>
+                                <tbody style="overflow-y: scroll; height: 237px; width: 97%; position: absolute;">
+                                        {% for en in entrega %}
+                                        {% csrf_token %}
+                                        <tr>
+                                            <th scope="row" style="width: 10%;">{{ forloop.counter }}</th>
+                                            {% for al in alumno %}
+                                                {% if al.id_alumno == en.id_alumno %}
+                                                    <td style="width: 33%;">{{ al.nombre_alumno }}</td>
+                                                    <td style="width: 20%;">{{ al.num_matricula }}</td>
+                                                    <td style="width: 15%;">{{ en.fecha_hora_subida }}</td>
+                                                    <td style="width: 15%;">ITT-POC-09-01 SOLICITUD_DE_RESIDENCIA_PROFESIONAL</td>
+                                                    {% for ar in archivo %}
+                                                        {% if ar.tipo_archivo == 'Entrega' and ar.id_alumno == en.id_alumno%}
+                                                        <td style="width: 30%;">{{ ar.nombre_archivo }}</td>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    <td style="width: 20%;"><a class="btn btn-info btn-sm" href="/TBC/revisar-actividad/{{ actividad.id_actividad }}/{{ al.id_alumno }}"  type="submit" data-toggle="tooltip" data-placement="right" title="Revisar" style="color: white;"><i class="fas fa-check"></i></a></td>
+                                                {% endif %}
+                                            {% endfor %}
+                                            {% if en.calificada is True %}
+                                                <td style="width: 45%;"> <span class="badge badge-pill badge-success" style="margin-left: 2%; font-size: 85%;">R</h5></span></td>
+                                            {% endif %}
+                                        </tr>
+                                        {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        //Función para mostrar mensaje de confirmación de inserción y actualización
+        function confirmDialog(){
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: "Confirme si desea realizar la acción",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Confirmar'
+            }).then((result) => {
+                if (result.value) {
+                    document.getElementById('btnGuardar').click();
+                }
+                })
+        }
+
+        //Función al dar click al eliminar archivo
+        function confirmDialogDelete(idAct, tipo, name){
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: "Confirme si desea realizar la acción",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Confirmar'
+            }).then((result) => {
+                if (result.value) {
+                    window.location.replace('/TBC/delete-archivo/'+idAct+'/'+tipo+'/'+name);
+                }
+                })
+        }
+
+        // Función para quitar los labels y los inputs cuando se selecciona un nuevo archivo de recurso
+        function limpiaInputsRecursos(){
+            var list = document.getElementsByClassName('lblRecurso'); 
+            for(var i = list.length - 1; 0 <= i; i--)
+                if(list[i] && list[i].parentElement)
+                    list[i].parentElement.removeChild(list[i]);
+            var inp = document.getElementsByName('descRecurso'); 
+            for(var i = inp.length - 1; 0 <= i; i--)
+                if(inp[i] && inp[i].parentElement)
+                    inp[i].parentElement.removeChild(inp[i]);
+        }
+
+        // Función para quitar los labels y los inputs cuando se selecciona un nuevo archivo de rubrica
+        function limpiaInputsRubricas(){
+            var list = document.getElementsByClassName('lblRubrica'); 
+            for(var i = list.length - 1; 0 <= i; i--)
+                if(list[i] && list[i].parentElement)
+                    list[i].parentElement.removeChild(list[i]);
+            var inp = document.getElementsByName('descRubrica'); 
+            for(var i = inp.length - 1; 0 <= i; i--)
+                if(inp[i] && inp[i].parentElement)
+                    inp[i].parentElement.removeChild(inp[i]);
+        }
+
+        // Función para que por cada archivo selccionado se inserte un input para ingresar la descripción (recurso)
+        inputElementR = document.getElementById("inputRecursos");
+        inputElementR.onchange = function(event) {
+            var fileList = inputElementR.files;
+            for (var i = 0; i < fileList.length; i++){
+                //Creación de label
+                let lb = document.createElement('label');
+                lb.innerHTML = 'Ingrese la descripción del archivo <strong>' + fileList[i].name + '</strong>';
+                lb.id = 'labelRecurso';
+                lb.className = 'lblRecurso';
+                let div = document.getElementById("divInputsRecursos");
+                div.appendChild(lb);
+                //Creación de los inputs para insertar las descripciones
+                let el = document.createElement("input");
+                el.className = "form-control border border-ligth mb-3";
+                el.placeholder = "Descripción";
+                el.id = "descripcionRecurso";
+                el.name = 'descRecurso' //+i
+                div.appendChild(el);
+            }
+        }
+
+        // Función para que por cada archivo selccionado se inserte un input para ingresar la descripción (rubrica)
+        inputElement = document.getElementById("inputRubricas");
+        inputElement.onchange = function(event) {
+            var fileList = inputElement.files;
+            for (var i = 0; i < fileList.length; i++){
+                //Creación de label
+                let lb = document.createElement('label');
+                lb.innerHTML = 'Ingrese la descripción del archivo <strong>' + fileList[i].name +'</strong>';
+                lb.id = 'labelRubrica';
+                lb.className = 'lblRubrica';
+                let div = document.getElementById("divInputsRubricas");
+                div.appendChild(lb);
+                //Creación de los inputs para insertar las descripciones
+                let el = document.createElement("input");
+                el.className = "form-control border border-ligth mb-3";
+                el.placeholder = "Descripción";
+                el.id = "descripcionRubrica";
+                el.name = 'descRubrica'
+                el.type = 'text'
+                div.appendChild(el);
+            }
+        }
+    </script>
+    
+{% endblock %}

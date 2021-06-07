@@ -1,0 +1,124 @@
+{% extends 'baseTBC.html'%}
+{% load static %}
+{% block content %}
+<title>Generar certificado</title>
+        <div class="form-row">
+            <div class="col-md-6">
+                <!--Tarjeta de filtro e info-->
+                <div class="container-flex mb-3" id="wwg-accordian">
+                    <div class="card">
+                        <div class="card-header" id="filtroInfo-heading" style="background-color: white;">      
+                            <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#filtroInfo" style="cursor:pointer;"><i class="far fa-file-alt"></i>&nbsp;Formulario para generar certificado</h5>
+                        </div>
+                        <div class="collapse show" id="filtroInfo">
+                            <div class="card-text p-3">
+                                <div class="form-row mb-2">
+                                    <div class="col-md-12">
+                                        <select class="selectpicker" data-live-search="true" data-width="100%" data-size="4" title="Buscar alumno..."  id="selectAlumno" required>
+                                            {% for al in alumno%}
+                                                <option value="{{ al.id_alumno }}">{{ al.nombre_alumno }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div> 
+                                </div>
+                                <hr>
+                                <div class="form-row mb-3">
+                                    <div class="col-md-6">
+                                        <form method="post">
+                                            <label for="name">Matrícula del alumno</label>
+                                            <input type="text" class="form-control border border-ligth" id="matricula" name="matriculaAlumno" placeholder="Matrícula" required>
+                                        </form>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="name">Semestre</label>
+                                        <input type="text" class="form-control border border-ligth" id="semestre" name="semestre" placeholder="Semestre" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="name">Institución</label>
+                                        <input type="text" class="form-control border border-ligth" id="institución" name="institución" placeholder="Institución" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="name">CCT</label>
+                                        <input type="text" class="form-control border border-ligth" id="cct" name="cct" placeholder="CCT" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-12">
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            <!-- <input type="text" id="inputMateria" name="materia" hidden required>
+                                            <input type="text" id="inputGrupo" name="grupo" hidden required> -->
+                                            <input type="text" name="bandera" value="False" hidden required>
+                                            <input type="text" id="inputDocente" name="docente" hidden required>
+                                            <input type="text" id="inputModulo" name="modulo" hidden required>
+                                            <button class="btn btn-outline-success btn-block" type="submit">Generar</button>
+                                        </form>
+                                    </div>
+                                    <!-- <div class="col-md-6 mb-3">
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            <input type="text" id="inputAlumno" name="nombreAlumno" hidden>
+                                            <input type="text" id="inputGrupo" name="grupo" hidden> 
+                                            <button class="btn btn-outline-success btn-block" type="submit">Guardar</button>
+                                        </form>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+            <!--Columna derecha-->
+            <div class="col-md-6 mb-3">
+                <!--Tarjeta de filtro e info-->
+                <div class="container-flex mb-3" id="wwg-accordian">
+                    <div class="card">
+                        <div class="card-header" id="filtroHistorial-heading" style="background-color: white;">      
+                            <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#filtroHistorial" style="cursor:pointer;"><i class="fas fa-filter"></i>&nbsp;Búsqueda certificados generados</h5>
+                        </div>
+                        <div class="collapse show" id="filtroHistorial">
+                            <div class="card-text p-3">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="text" hidden id="inputDocenteModulo" name="docenteModulo">
+                                    <label for="buscar">Búsqueda por nombre de alumno</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control border border-ligth rounded-left" placeholder="Search" name="buscarAlumno" id="inputAlumno" onkeyup="filtraAlumno();">
+                                        <div class="input-group-btn border border-ligth rounded-right">
+                                            <button class="btn btn-default" style="cursor: context-menu;">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <table class="table table-borderless table-hover" id="listaAlumnos" style="height: 250px; display: -moz-groupbox;">
+                                        <thead>
+                                          <tr style="width: 100%; display: inline-table; height:60px; table-layout: fixed;">
+                                            <th style="width: 10%;">#</th>
+                                            <th style="width: 25%;">Nombre</th>
+                                            <th style="width: 19%;">Matrícula</th>
+                                            <th style="width: 25%;">Semestre</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody style="overflow-y: scroll; height: 200px; width: 95%; position: absolute;">
+                                                {% for al in alumnoS %}
+                                                {% csrf_token %}
+                                                <tr>
+                                                    <th scope="row" style="width: 5%;">{{ forloop.counter }}</th>
+                                                    <td hidden>{{ al.id_alumno }} <input name="id_alumnoL" type="text" value="{{ al.id_alumno }}"> </td>
+                                                    <td style="width: 30%;">{{ al.nombre_alumno }} <input hidden name="nombreAlumnoTabla" type="text" value="{{ al.nombre_alumno }}"> </td>
+                                                    <td style="width: 15%;">{{ al.num_matricula }}</td>
+                                                    <td style="width: 15%;">{{ al.semestre }}</td>
+                                                    <td style="width: 5%;"><a id="btnActa" type="button" class="btn btn-warning btn-block" style="color: white;" target="_blank"><i class="fas fa-eye"></i></a></td>
+                                                </tr>
+                                                {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}

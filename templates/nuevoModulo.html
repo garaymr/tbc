@@ -1,0 +1,87 @@
+{% extends 'baseTBC.html'%}
+{% load static %}
+{% block content%}
+    <script src="{% static 'js/nuevoModJs.js' %}" defer></script>
+    <h4>Programas de la institución</h4>
+    <div class="scrollable" style="height: 400px; overflow: scroll;">
+        <table id="tableModulos" class="table-wrapper-scroll-y table table-striped table-bordered table-hover">
+            <tr style=" background-color: #BDBDBD"><td colspan="4"><h4>Modulos</h4></td></tr>
+                {% for mod in modulos %}
+                    <tr id="tableRow{{mod.id_modulo}}" onclick="setModulo(this.id)">
+                    <td id="tableMod-{{mod.id_modulo}}">{{mod.nombre_modulo}}</td>
+                    <td id="tableAD-{{mod.areadisciplinar_modulo.id_areadisciplinar}}-{{mod.semestre_modulo.id_semestre}}">{{mod.areadisciplinar_modulo.nombre_areadisciplinar}}</td>
+            </tr>   
+                {% endfor %}
+        </table>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-lg-6 mt-3">
+                <br>
+                <h4 id="tituloModulo">Módulo</h5>
+                    <label for="nombreAlumno">Nombre</label>
+                    <div class="row">
+                        <input type="text" id="inputNombre" class="form-control border border-ligth col-lg-8" id="nombreAlumno" name="nombreAlumno" placeholder="Nombre" required value="{{ alumnoSel.nombre_alumno | default_if_none:'' }}">
+                        <a id="btnGuardarModulo" class="col-lg-2 btn btn-block btn-info"><i class="fas fa-save"></i> Guardar</a>
+                    </div>
+                    <div class="invalid-tooltip">
+                        Por favor introduzca el nombre
+                    </div>
+                    <br>
+                    <h4 id="tituloUnidades">Unidades</h4>
+                        <div id="divUnidades"></div>
+                        <br>
+                        <a id="btnNU" class="col-lg-6 btn btn-block btn-outline-success disabled" ><i class="fas fa-plus"></i> Agregar nueva unidad</a>
+                    <hr class="col-lg-10">
+
+                    <h4 id="tituloAPES">Aprendizajes Esperados</h4>
+                        <div id="divApEsperados"></div>
+                        <br>
+                        <a id="btnNAE" class="col-lg-6 btn btn-block btn-outline-success disabled"><i class="fas fa-plus"></i> Agregar nuevo aprendizaje esperado</a>
+                    <hr class="col-lg-10">
+
+
+        </div>
+    <br>
+    <div class="col-md-6 col-lg-6">
+        <br>
+       <h4>Instituto Telebachiller #3</h4>
+       <br>
+       <h5>Programa del módulo</h5>
+       <div class="row">
+       <input id="pdfInput" name="input-b1" type="file" class="file" data-browse-on-zone-click="true">
+       <button id="btnGuardarArchivo" class="col-lg-2 btn btn-block btn-info disabled"><i class="fas fa-save"></i> Guardar</button>
+        </div>
+       <br>
+       <br>
+        <label style="font-size: 20px;">Semestre *</label>
+        <select style="text-align: center;" id="selectSemestre" name="selectSemestre"  class="form-control border border-ligth col-lg-3">
+            <option value="">Seleccionar semestre</option>
+            {% for semestre in semestres %}
+                <option value="{{ semestre.id_semestre }}">{{ semestre.nombre_semestre }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label style="font-size: 20px;">Área disciplinar *</label>
+        <select style="text-align: center;" id="selectAD" name="selectAD"  class="form-control border border-ligth col-lg-5">
+            <option value="">Seleccionar área disciplinar</option>
+            {% for A_D in areas_disc %}
+                <option value="{{ A_D.id_areadisciplinar }}">{{ A_D.nombre_areadisciplinar }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label style="font-size: 20px;">Fecha alta</label>
+        <input readonly value="{% now "j/n/Y" %}" style="text-align: center;" type="text" class="form-control border border-ligth col-lg-4" id="fechaAlta" name="fechaAlta">
+        <br>
+        <label style="font-size: 20px;">Créditos *</label>
+        <input style="text-align: center;" type="text" class="form-control border border-ligth col-lg-4" id="inputCreditos" name="creditosModulo">
+        <br>
+            <label id="tituloPropUnidad" style="font-size: 20px;">Próposito de la unidad</label>
+                <div class="row">
+                    <textarea style="height: 250px;"  class="form-control rounded-0 col-lg-7" id="propositoUnidad" rows="3"></textarea>
+                    <button id="btnGuardarProposito" class="col-lg-2 btn btn-block btn-info disabled"><i class="fas fa-save"></i> Guardar</button>
+                </div>
+    </div>
+
+
+</div>
+    {% endblock %}

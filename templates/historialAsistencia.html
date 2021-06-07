@@ -1,0 +1,142 @@
+{% extends 'baseTBC.html'%}
+{% load static %}
+{% block content%}
+    <title>Historial de asistencia</title>
+    <div class="form-row">
+        <div class="col-md-12">
+            <!--Tarjeta de filtro e info-->
+            <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="filtroInfo-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#filtroInfo" style="cursor:pointer;"><i class="far fa-eye"></i>&nbsp;Búsqueda</h5>
+                    </div>
+                    <div class="collapse show" id="filtroInfo">
+                        <div class="card-text p-3">
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="form-row mb-3">
+                                    <div class="col-md-6 mb-3">
+                                        <select class="selectpicker" data-live-search="true" data-width="100%" data-size="4" title="Buscar alumno..."  id="selectAlumnos" onchange="seleccionAlumno();">
+                                            {% for al in alumno %}
+                                            <option value="{{ al.nombre_alumno }}">{{ al.nombre_alumno }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <select class="selectpicker" data-live-search="true" data-width="100%" data-size="4" title="Semestre..."  id="selectSemestre" onchange="seleccionSemestreI();">
+                                            <option value="1">Semestre 1</option>
+                                            <option value="2">Semestre 2</option>
+                                            <option value="3">Semestre 3</option>
+                                            <option value="4">Semestre 4</option>
+                                            <option value="5">Semestre 5</option>
+                                            <option value="6">Semestre 6</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2 mb-2">
+                                        <select class="selectpicker" data-live-search="true" data-width="100%" data-size="4" title="Grupo"  id="selectGrupo" onchange="seleccionGrupo();">
+                                            {% for al in alumno %}
+                                            <option value="{{ al.cct }}">{{ al.cct }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1 mb-3">
+                                        <select class="selectpicker" data-live-search="true" data-width="100%" data-size="4" title="Año"  id="selectAno" onchange="seleccionAno();">
+                                            <option value="2020">2020</option>
+                                            <option value="2019">2019</option>
+                                            <option value="2018">2018</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1 mb-3">
+                                            <input type="text" id="inputAlumno" name="nombreAlumno" hidden>
+                                            <input type="text" id="inputSemestre" name="semestre" hidden>
+                                            <input type="text" id="inputGrupo" name="grupo" hidden>
+                                            <button class="btn btn-outline-info btn-block" onclick="seleccionSemestre()">Buscar</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Tarjeta del historial-->
+    <div class="container-flex mb-3" id="wwg-accordian">
+        <div class="card">
+            <div class="card-header" id="historial-heading" style="background-color: white;">      
+                <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#historial" style="cursor:pointer; display: inline"><i class="fas fa-book"></i>&nbsp;Historial</h5>
+            </div>
+            <div class="collapse show" id="historial">
+                <div class="card-text p-3">
+                    <table class="table table-striped">
+                        <thead class="text-center">
+                            <tr>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Matrícula</th>
+                                <th scope="col">Semestre</th>
+                                <th scope="col">Fecha</th>
+                                <th scope="col">Municipio</th>
+                                <th scope="col">Asistencia</th>
+                            </tr>
+                        </thead>
+                        <tbody >
+                            {% for al in alumnoSel %}
+                            <tr>
+                                <td>{{ al.nombre_alumno }}</td> <!--Nombre-->
+                                <td class="text-center">{{ al.num_matricula }} </td> <!--Matrícula-->
+                                <td class="text-center" id="semestreSel">{{ al.semestre}}</td> <!--Semestre-->
+                                <td class="text-center">{% now "jS F Y " %}</td> <!--Fecha-->
+                                <td class="text-center">{{ al.nombre_escuela }}</td> <!--Municipio-->
+                                <td class="text-center"> <input type="checkbox" id="asistencia"></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        //Función para quitar valores repetidos de grupos (cct)
+        var optionValues =[];
+        $('#selectGrupo option').each(function(){
+            if($.inArray(this.value, optionValues) >-1){
+                $(this).remove()
+                }else{
+                    optionValues.push(this.value);
+                }
+        });
+
+        $(document).ready(function(){
+            $("#myInput").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+                $("#listaAlumnos *").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+
+        //Funcion para cuando se selecciona a un alumno
+        function seleccionAlumno(){
+            var sel = document.getElementById('selectAlumnos')
+            var val = sel.options[sel.selectedIndex].value
+            document.getElementById('inputAlumno').value = val
+        }
+
+        //Funcion para cuando se selecciona un semestre
+        function seleccionSemestreI(){
+            var sel = document.getElementById('selectSemestre')
+            var val = sel.options[sel.selectedIndex].value
+            document.getElementById('inputSemestre').value = val
+        }
+
+        //Funcion para cuando se selecciona un grupo
+        function seleccionGrupo(){
+            var sel = document.getElementById('selectGrupo')
+            var val = sel.options[sel.selectedIndex].value
+            document.getElementById('inputGrupo').value = val
+        }
+        
+    </script>    
+{% endblock %}

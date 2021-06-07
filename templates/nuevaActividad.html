@@ -1,0 +1,282 @@
+{% extends 'baseTBC.html'%}
+{% load static %}
+{% block content%}
+    <title>Nueva actividad</title>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-row">
+            <!--Columna izquierda-->
+            <div class="col-md-7 mt-3">
+                <!--Tarjeta de nueva actividad-->
+                <div class="container-flex mb-3" id="wwg-accordian">
+                    <div class="card">
+                        <div class="card-header" id="nueva-actividad-heading" style="background-color: white;">      
+                            <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#nueva-actividad" style="cursor:pointer;"><i class="far fa-file-alt"></i>&nbsp;Nueva actividad</h5>
+                        </div>
+                        <div class="collapse show" id="nueva-actividad">
+                            <div class="card-text p-3">
+                                <h6>Llene todos los campos</h6>
+                                <div class="form-row">
+                                    <input type="text" id="idActividad" name="idActividad" hidden>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="nombreActividad">Módulo</label>
+                                        <select class="selectpicker" data-live-search="true" data-width="100%" data-size="4" title="Seleccionar..."  id="selectModulo" onchange="seleccionModulo();">
+                                            {% for dc in docenteCurso %}
+                                                {% for cu in modulo %}
+                                                    {% if dc.id_curso == cu.id_modulo %}
+                                                    <option value="{{ cu.id_modulo }}">{{ cu.nombre_modulo }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endfor %}
+                                        </select>
+                                        <input hidden type="text" class="form-control border border-ligth" id="moduloActividad" name="moduloActividad" placeholder="Módulo" required>
+                                        <div class="invalid-tooltip">
+                                            Por favor introduzca el módulo
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="nombreActividad">Nombre de la actividad</label>
+                                        <input type="text" class="form-control border border-ligth" id="nombreActividad" name="nombreActividad" placeholder="Nombre" required>
+                                        <div class="invalid-tooltip">
+                                            Por favor introduzca el nombre
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="unidad">Unidad</label>
+                                        <input type="number" class="form-control border border-ligth" id="unidad" name="unidad" placeholder="unidad" required>
+                                        <div class="invalid-tooltip">
+                                            Introduzca la unidad
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="tipoActividad">Tipo de actividad</label>
+                                        <input type="text" class="form-control border border-ligth" id="tipoActividad" name="tipoActividad" placeholder="Tipo actividad" required>
+                                        <div class="invalid-tooltip">
+                                            Introduzca el tipo
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="tema">Tema</label>
+                                        <input type="text" class="form-control border border-ligth" id="tema" name="tema" placeholder="Tema" required >
+                                        <div class="invalid-tooltip">
+                                            Introduzca el tema
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="subtema">Subtema</label>
+                                        <input type="text" class="form-control border border-ligth" id="subtema" name="subtema" placeholder="subtema" required>
+                                        <div class="invalid-tooltip">
+                                            Introduzca el subtema
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-8">
+                                        <label for="objetivo">Objetivo</label>
+                                        <input type="text" class="form-control border border-ligth" id="objetivoActividad" name="objetivoActividad" placeholder="Objetivo" required>
+                                        <!-- <div class="form-group">
+                                            <label for="objetivoActividad">Objetivo de la activdad</label>
+                                            <textarea class="form-control border border-ligth" name="objetivoActividad" rows="1"></textarea>
+                                        </div> -->
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="fecha">Fecha</label>
+                                        <input type="text" class="form-control border border-ligth text-center" id="fecha" name="fecha" value=" {% now "SHORT_DATE_FORMAT" %} " disabled>
+                                    </div>
+                                </div>    
+                                <div class="form-row">
+                                    <div class="col-md-12 mb-3">
+                                        <br>
+                                        <label for="recurso">Seleccione el recurso para la actividad</label>
+                                        <br>
+                                        <input type="file" name="recurso" id="inputRecursos" multiple onclick="limpiaInputsRecursos();">
+                                    </div>
+                                </div>
+                                <div class="form-row" id="form-row">
+                                   <div class="col-md-12 mb-3" id="divInputsRecursos">
+
+                                   </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Columna derecha-->
+            <div class="col-md-5 mt-3">
+                <!--Tarjeta con formulario de configuración-->
+                <div class="container-flex mb-3" id="wwg-accordian">
+                    <div class="card">
+                        <div class="card-header" id="configuracion-heading" style="background-color: white;">      
+                            <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#configuracion" style="cursor:pointer;"><i class="fas fa-sliders-h"></i>&nbsp;Configuración</h5>
+                        </div>
+                        <div class="collapse show" id="configuracion">
+                            <div class="card-text p-3">
+                                <div class="form row">
+                                    <div class="col-md-12 mb-3">
+                                        <div class="card-text ">
+                                            {% for doc in docente %}
+                                                <h7>Docente:  {{ doc.nombres_docente }} {{ doc.apellidos_docente }}</h7>
+                                                <br>
+                                                Periodo: Ene - Ago 2020
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="recurso">Seleccione la rúbrica para la actividad</label>
+                                        <br>
+                                        <input type="file" name="rubrica" id="inputRubricas" multiple onclick="limpiaInputsRubricas();">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-12 mb-3" id="divInputsRubricas">
+
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="valorActividad">Valor en el parcial</label>
+                                        <div class="input-group mb-3">
+                                            <input type="number" class="form-control border border-ligth" name="valorActividad" placeholder="Valor en el parcial" aria-label="Valor en el parcial" aria-describedby="basic-addon2">
+                                            <div class="input-group-append">
+                                            <span class="input-group-text" id="basic-addon2">%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row mb-1">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="fechaHoraLimite">Fecha y hora límite</label> <br>
+                                        <input id="datetimepicker" type="text" class="form-control border border-ligth" name="fechaHoraLimite" autocomplete="off">
+                                        <script>
+                                            jQuery('#datetimepicker').datetimepicker();
+                                            jQuery.datetimepicker.setLocale('es');
+                                            jQuery('#datetimepicker').datetimepicker({
+                                                format:'d/m/Y H:i',
+                                                step:30
+                                                });
+                                        </script>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <a class="btn btn-outline-success btn-block" onclick="confirmDialog()" style="cursor: pointer;">Guardar</a>
+                                    <button class="btn btn-outline-success btn-block" hidden type="submit" id="btnGuardar"></button></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <script>
+        /*
+        Para seleccionar modulo
+        */
+        function seleccionModulo(){
+            var val = document.getElementById('selectModulo').value 
+            document.getElementById('moduloActividad').value = val
+        }
+
+        /*
+        // Función para quitar los labels y los inputs cuando se selecciona un nuevo archivo de recurso
+        */
+        function limpiaInputsRecursos(){
+            var list = document.getElementsByClassName('lblRecurso'); 
+            for(var i = list.length - 1; 0 <= i; i--)
+                if(list[i] && list[i].parentElement)
+                    list[i].parentElement.removeChild(list[i]);
+            var inp = document.getElementsByName('descRecurso'); 
+            for(var i = inp.length - 1; 0 <= i; i--)
+                if(inp[i] && inp[i].parentElement)
+                    inp[i].parentElement.removeChild(inp[i]);
+        }
+
+        /*
+        // Función para quitar los labels y los inputs cuando se selecciona un nuevo archivo de rubrica
+        */
+        function limpiaInputsRubricas(){
+            var list = document.getElementsByClassName('lblRubrica'); 
+            for(var i = list.length - 1; 0 <= i; i--)
+                if(list[i] && list[i].parentElement)
+                    list[i].parentElement.removeChild(list[i]);
+            var inp = document.getElementsByName('descRubrica'); 
+            for(var i = inp.length - 1; 0 <= i; i--)
+                if(inp[i] && inp[i].parentElement)
+                    inp[i].parentElement.removeChild(inp[i]);
+        }
+
+        /*
+        // Función para que por cada archivo selccionado se inserte un input para ingresar la descripción (recurso)
+        */
+        inputElementR = document.getElementById("inputRecursos");
+        inputElementR.onchange = function(event) {
+            var fileList = inputElementR.files;
+            for (var i = 0; i < fileList.length; i++){
+                //Creación de label
+                let lb = document.createElement('label');
+                lb.innerHTML = 'Ingrese la descripción del archivo <strong>' + fileList[i].name + '</strong>';
+                lb.id = 'labelRecurso';
+                lb.className = 'lblRecurso';
+                let div = document.getElementById("divInputsRecursos");
+                div.appendChild(lb);
+                //Creación de los inputs para insertar las descripciones
+                let el = document.createElement("input");
+                el.className = "form-control border border-ligth mb-3";
+                el.placeholder = "Descripción";
+                el.id = "descripcionRecurso";
+                el.name = 'descRecurso' //+i
+                div.appendChild(el);
+            }
+        }
+
+        /*
+        // Función para que por cada archivo selccionado se inserte un input para ingresar la descripción (rubrica)
+        */
+        inputElement = document.getElementById("inputRubricas");
+        inputElement.onchange = function(event) {
+            var fileList = inputElement.files;
+            for (var i = 0; i < fileList.length; i++){
+                //Creación de label
+                let lb = document.createElement('label');
+                lb.innerHTML = 'Ingrese la descripción del archivo <strong>' + fileList[i].name +'</strong>';
+                lb.id = 'labelRubrica';
+                lb.className = 'lblRubrica';
+                let div = document.getElementById("divInputsRubricas");
+                div.appendChild(lb);
+                //Creación de los inputs para insertar las descripciones
+                let el = document.createElement("input");
+                el.className = "form-control border border-ligth mb-3";
+                el.placeholder = "Descripción";
+                el.id = "descripcionRubrica";
+                el.name = 'descRubrica'
+                el.type = 'text'
+                div.appendChild(el);
+            }
+        }
+
+        /*
+        // Función para confirmar la acción
+        */
+        function confirmDialog(){
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: "Confirme si desea realizar la acción",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Confirmar'
+            }).then((result) => {
+                if (result.value) {
+                    document.getElementById('btnGuardar').click();
+                }
+                })
+        }
+    </script>
+    
+{% endblock %}

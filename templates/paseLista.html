@@ -1,0 +1,160 @@
+{% extends 'baseTBC.html'%}
+{% load static %}
+{% block content%}
+    <!-- En caso de que sea una institución (1) como usuario, solo se muestra el historial de asistencia -->
+    {% if usuario.tipo_usuario == "1" %}
+    <title>Historial de asistencia</title>
+        <div class="form-row">
+            <div class="col-md-12">
+                <!--Tarjeta de filtro e info-->
+                <div class="container-flex mb-3" id="wwg-accordian">
+                    <div class="card">
+                        <div class="card-header" id="filtroHistorial-heading" style="background-color: white;">      
+                            <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#filtroHistorial" style="cursor:pointer;"><i class="fas fa-filter"></i>&nbsp;Filtros para historial</h5>
+                        </div>
+                        <div class="collapse show" id="filtroHistorial">
+                            <div class="card-text p-3">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <div class="form-row">
+                                        <div class="col-md-2">
+                                            <select class="selectpicker" data-live-search="true" data-width="100%" data-size="4" title="Semestre"  id="selectSemestreH" onchange="seleccionSemestreH();" required>
+                                                <option value="1">1er semestre</option>
+                                                <option value="2">2do semestre</option>
+                                                <option value="3">3er semestre</option>
+                                                <option value="4">4to semestre</option>
+                                                <option value="5">5to semestre</option>
+                                                <option value="6">6to semestre</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select class="selectpicker" data-live-search="true" data-width="100%" data-size="4" title="Materia"  id="selectMateriaH" onchange="seleccionMateriaH();" required>
+                                               
+                                                {% for doc in docente %}
+                                                    {% for mod in modulo %}
+                                                        {% for docmod in docenteCurso %}
+                                                            {% if docmod.id_curso == mod.id_modulo and docmod.id_docente == doc.id_docente %}
+                                                                <option value="{{ docmod.id_dc }}"> <strong>{{ mod.nombre_modulo }}</strong> -  {{ doc.nombres_docente }} </option>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    {% endfor %}
+                                                {% endfor %}
+                                                    
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select class="selectpicker" data-live-search="true" data-width="100%" data-size="4" title="Grupo"  id="selectGrupoH" onchange="seleccionGrupoH();" required>
+                                                {% for al in alumno %}
+                                                    <option value="{{ al.cct }}">{{ al.cct }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input id="datetimepicker" type="text" class="form-control border border-ligth text-center" name="fechaH" autocomplete="off" required>
+                                            <script>
+                                                jQuery('#datetimepicker').datetimepicker();
+                                                jQuery.datetimepicker.setLocale('es');
+                                                jQuery('#datetimepicker').datetimepicker({
+                                                    format:'d/m/Y',
+                                                    step:30,
+                                                    timepicker:false
+                                                    });
+                                            </script>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <form method="post">
+                                                {% csrf_token %}
+                                                <div class="col-md-12 mb-3">
+                                                    <input type="text" id="inputSemestreH" name="semestreH" hidden>
+                                                    <input type="text" id="inputMateriaH" name="materiaH" hidden>
+                                                    <input type="text" id="inputGrupoH" name="grupoH" hidden>
+                                                    <input type="text" name="bandera" value="False" hidden>
+                                                    <button class="btn btn-outline-info btn-block" type="submit" >Buscar</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Tarjeta del historial-->
+                <div class="container-flex mb-3" id="wwg-accordian">
+                    <div class="card">
+                        <div class="card-header" id="historial-heading" style="background-color: white; height: 63px;">      
+                            <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#historial" style="cursor:pointer; display: inline"><i class="fas fa-book"></i>&nbsp;Historial</h5>
+                        </div>
+                        <div class="collapse show" id="historial">
+                            <div class="card-text p-2">
+                                <table class="table table-borderless table-hover" style="height: 500px; display: -moz-groupbox;">
+                                    <thead >
+                                        <tr style="display: inline-table; height:60px; table-layout: fixed;">
+                                            <th scope="col" style="width: 78.7%;">Nombre</th>
+                                            <th scope="col" style="width: 11.12%;">Matrícula</th>
+                                            <th scope="col" style="width: 0%;">A</th>
+                                            <th scope="col" style="width: 0%;">R</th>
+                                            <th scope="col" style="width: 0%;">J</th>
+                                            <th scope="col">
+                                                <button type="button" class="btn btn-light btn-sm" data-toggle="popover" title="Nomenclatura" data-html="true" data-content="A - Asistencia <br>R - Retardo<br>J - Justificación<br>F - Falta">?</button>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="overflow-y: scroll; height: 450px; width: 98.5%; position: absolute;">
+                                        {% for as in asistencia %}
+                                            {% for al in alumno %}
+                                                {% if as.id_alumno == al.id_alumno %}
+                                                    <tr>
+                                                        <td style="width: 80%;">{{ al.nombre_alumno }}</td> <!--Nombre-->
+                                                        <td style="width: 11%;">{{ al.num_matricula }} </td> <!--Matrícula-->
+                                                        {% if as.asistencia is True %}
+                                                            <td style="width: 0%; padding-top: 0;"> &nbsp;&nbsp;&nbsp;<input type="checkbox" id="asistencia" checked disabled></td>
+                                                        {% else %}
+                                                            <td style="width: 0%; padding-top: 0;"> &nbsp;&nbsp;&nbsp;<input type="checkbox" id="asistencia" disabled></td>
+                                                        {% endif %}
+                                                        
+                                                        {% if as.retardo is True %}
+                                                            <td style="width: 0%; padding-top: 0;" class="text-center"> &nbsp;&nbsp;&nbsp;<input type="checkbox" id="retardo" checked disabled></td>
+                                                        {% else %}
+                                                            <td style="width: 0%; padding-top: 0;" class="text-center"> &nbsp;&nbsp;&nbsp;<input type="checkbox" id="retardo" disabled></td>
+                                                        {% endif %}
+                                                        
+                                                        {% if as.justificacion is True %}
+                                                            <td style="width: 0%; padding-top: 0;" class="text-center"> &nbsp;&nbsp;<input type="checkbox" id="justificacion" checked disabled></td>
+                                                        {% else %}
+                                                            <td style="width: 0%; padding-top: 0;" class="text-center"> &nbsp;&nbsp;<input type="checkbox" id="justificacion" disabled></td>
+                                                        {% endif %}
+
+                                                        {% if as.falta is True %}
+                                                            <td class="text-center" style="display: inline;"> <span id="spanE" class="badge badge-pill badge-danger" style="margin-top: 54.5%; margin-left: 2%; font-size: 85%; padding-top: 13%;">F</span></td>
+                                                        {% else %}
+                                                            <td class="text-center" style="display: inline;"> <span  class="badge badge-pill" style="margin-top: 54.5%; margin-left: 2%; font-size: 85%; padding-top: 13%; color: white;">&nbsp;&nbsp;&nbsp;</span></td>
+                                                        {% endif %}
+                                                    </tr>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% empty %}
+                                                    <tr>
+                                                        <td style="width: 10%;">
+                                                            <div class="alert alert-danger" role="alert">
+                                                                <div class="form-row">
+                                                                    <strong class="col-md-12 text-center">Ningún alumno correspondiente al grupo</strong>
+                                                                </div>
+                                                                <div class="form-row">
+                                                                    <p class="col-md-12 text-center">Seleccione un grupo o consúltelo con la institución.</p>
+                                                                </div>
+                                                            </div>  
+                                                        </td>
+                                                    </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <button class="btn btn-outline-success btn-block" type="submit" >Guardar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %} 
+{% endblock %}

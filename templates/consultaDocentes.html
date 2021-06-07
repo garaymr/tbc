@@ -1,0 +1,474 @@
+{% extends 'baseTBC.html'%}
+{% load static %}
+{% block content%}
+    <title>Consulta de docentes</title>
+    <div class="form-row">
+        <!--Columna izquierda-->
+        <div class="col-md-6 mt-3">
+            <!--Tarjeta de lista de alumnos-->
+            <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="docentes-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#docentes" style="cursor:pointer;"><i class="fas fa-chalkboard-teacher"></i>&nbsp;Docentes</h5>
+                    </div>
+                    <div class="collapse show" id="docentes">
+                        <div class="card-text p-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control border border-ligth rounded-left" placeholder="Search" name="buscarDocente" id="inputDocente" onkeyup="filtraDocente();">
+                                <div class="input-group-btn border border-ligth rounded-right">
+                                    <button class="btn btn-default" style="cursor: context-menu;">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <table class="table table-borderless table-hover" id="listaDocentes" style="height: 250px; display: -moz-groupbox;">
+                                <thead>
+                                  <tr style="width: 100%; display: inline-table; height:60px; table-layout: fixed;">
+                                    <th>#</th>
+                                    <th>Nombre</th>
+                                    <th>No. empleado</th>
+                                  </tr>
+                                </thead>
+                                <tbody style="overflow-y: scroll; height: 200px; width: 95%; position: absolute;">
+                                        {% for doc in docente %}
+                                        {% csrf_token %}
+                                        <tr>
+                                            <th scope="row" style="width: 27%;">{{ forloop.counter }}</th>
+                                            <td style="width: 54.5%;"> {{ doc.nombres_docente }} </td>
+                                            <td style="width: 20%;">{{ doc.num_empleado }}</td>
+                                            <td><button class="btn btn-outline-info btn-sm" type="submit" onclick="seleccionaDocente('{{ doc.id_docente }}', '{{ doc.nombres_docente }}', '{{ doc.apellidos_docente | default_if_none:'' }}', '{{ doc.edad_docente | default_if_none:'' }}', '{{ doc.email | default_if_none:'' }}', '{{ doc.tel_fijo | default_if_none:'' }}', '{{ doc.tel_cel | default_if_none:'' }}', '{{ doc.curp_docente | default_if_none:'' }}', '{{ doc.rfc_docente | default_if_none:'' }}', '{{ doc.areadisciplinar_docente_id | default_if_none:'' }}', '{{ doc.nombre_escuela | default_if_none:'' }}', '{{ doc.cct | default_if_none:'' }}' , '{{ doc.domicilio | default_if_none:'' }}', '{{ doc.num_empleado | default_if_none:'' }}', '{{ doc.perfil_profesional | default_if_none:'' }}', '{{ doc.maximo_grado | default_if_none:'' }}'   ); "><i class="far fa-edit"></i></button></td>
+                                            <td><button class="btn btn-outline-danger btn-sm" onclick="confirmDialogDelete('{{ doc.id_docente }}')" style="cursor: pointer;"> <i class="far fa-trash-alt"></i> </button></td>
+                                            {% for ar in archivo %}
+                                                {% if ar.id_docente == doc.id_docente %}
+                                                    {% if ar.tipo_archivo == 'Curriculum' %}
+                                                        <td style="display: none;"><input class="inputsCurriculum" class="inputsCurriculum" id="inputCurriculum" type="text" value="{{doc.id_docente}}{{ ar.url }}"></td>
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </tr>
+                                        {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Tarjeta de resumen de alumno-->
+            <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="resumen-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#resumen" style="cursor:pointer;"><i class="fas fa-archive"></i>&nbsp;Resumen del docente</h5>
+                    </div>
+                    <div class="collapse show" id="resumen">
+                        <div class="card-text p-3">
+                            <div class="form-row">
+                                <!--Nombres de etiquetas-->
+                                <div class="col-md-6 p-3">
+                                    <label for=""> Nombre</label>
+                                    <br>
+                                    <label for=""> Clave</label>
+                                    <br>
+                                    <label for=""> RFC</label>
+                                    <br>
+                                    <label for=""> Email</label>
+                                    <br>
+                                    <label for=""> Num. celular</label>
+                                    <br>
+                                    <label for=""> CCT</label>
+                                </div>
+                                <!--Datos-->
+                                <div class="col-md-6 p-3 text-right ">
+                                    <label id="l_nombre_docente"> </label>
+                                    <br>
+                                    <label id="l_clave"> </label>
+                                    <br>
+                                    <label id="l_rfc"> </label>
+                                    <br>
+                                    <label id="l_email"> </label>
+                                    <br>
+                                    <label id="l_num_cel"></label>
+                                    <br>
+                                    <label id="l_cct"> </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Columna derecha-->
+        <div class="col-md-6 mt-3">
+            <form class="needs-validation" novalidate method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+                <!--Tarjeta con formulario del alumno-->
+                <div class="container-flex mb-3" id="wwg-accordian">
+                    <div class="card">
+                        <div class="card-header" id="datos-generales-heading" style="background-color: white;">      
+                            <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#datos-generales" style="cursor:pointer;"><i class="far fa-edit"></i>&nbsp;Datos generales</h5>
+                        </div>
+                        <div class="collapse show" id="datos-generales">
+                            <div class="card-text p-3">
+                                <div class="form-row">
+                                    <input type="text" id="idDocente" name="idDocente" hidden>
+                                    <div class="col-md-8 mb-3">
+                                        <label for="nombresDocente">Nombre</label>
+                                        <input type="text" class="form-control border border-ligth" id="nombresDocente" name="nombresDocente" placeholder="Nombre" required >
+                                        <div class="invalid-tooltip">
+                                            Por favor introduzca el nombre
+                                        </div>
+                                    </div>
+                                    <div hidden class="col-md-4 mb-3">
+                                        <label for="apellidosDocente">Apellidos</label>
+                                        <input type="text" class="form-control border border-ligth" id="apellidosDocente" name="apellidosDocente" placeholder="Apellidos" required >
+                                        <div class="invalid-tooltip">
+                                            Por favor introduzca los apellidos
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="edad">Edad</label>
+                                        <input type="number" class="form-control border border-ligth" id="edad" name="edad" placeholder="Edad" required>
+                                        <div class="invalid-tooltip">
+                                            Introduzca su edad
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="email">Email</label>
+                                        <input type="text" class="form-control border border-ligth" id="email" name="email" placeholder="Email" required >
+                                        <div class="invalid-tooltip">
+                                            Introduzca su email
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="telFijo">Teléfono fijo</label>
+                                        <input type="number" class="form-control border border-ligth" id="telFijo" name="telFijo" placeholder="Teléfono fijo" required>
+                                        <div class="invalid-tooltip">
+                                            Introduzca el teléfono
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="telCelular">Teléfono celular</label>
+                                        <input type="number" class="form-control border border-ligth" id="telCelular" name="telCelular" placeholder="Teléfono celular" required >
+                                        <div class="invalid-tooltip">
+                                            Introduzca el número de celular
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="curp">CURP</label>
+                                        <input type="text" class="form-control border border-ligth" id="curp" name="curp" placeholder="CURP" required >
+                                        <div class="invalid-tooltip">
+                                            Introduzca la CURP
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="rfc">RFC</label>
+                                        <input type="text" class="form-control border border-ligth" id="rfc" name="rfc" placeholder="RFC" required >
+                                        <div class="invalid-tooltip">
+                                            Introduzca el RFC
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="domicilio">Domicilio</label>
+                                        <input type="text" class="form-control border border-ligth" id="domicilio" name="domicilio" placeholder="Domicilio" required >
+                                        <div class="invalid-tooltip">
+                                            Introduzca el domicilio
+                                        </div>
+                                    </div>
+                                </div>    
+                                <div class="form-row">
+                                    <div class="col-md-2 mb-3">
+                                        <label for="num_empleado">No. empleado</label>
+                                        <input type="text" class="form-control border border-ligth" id="num_empleado" name="num_empleado" placeholder="No. empleado" required >
+                                        <div class="invalid-tooltip">
+                                            Introduzca el domicilio
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="perfil_profesional">Perfil profesional</label>
+                                        <input type="text" class="form-control border border-ligth" id="perfil_profesional" name="perfil_profesional" placeholder="Perfil profesional" required >
+                                        <div class="invalid-tooltip">
+                                            Introduzca el domicilio
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="maximo_grado">Máximo grado de estudios</label>
+                                        <input type="text" class="form-control border border-ligth" id="maximo_grado" name="maximo_grado" placeholder="Máximo grado de estudios" required >
+                                        <div class="invalid-tooltip">
+                                            Introduzca el domicilio
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="colonia">Curriculum</label>
+                                        <div class="form-row">
+                                            <div class="col-md-6">
+                                                <input type="file" name="curriculum" id="inputCurriculumA" style="display: none;" />
+                                                <button id="btnArchivo" type="button" class="btn btn-outline-primary btn-block" onclick="document.getElementById('inputCurriculumA').click();"><i class="fas fa-upload"></i></button>
+                                                <!-- <input type="button" value="Buscar..." class="btn btn-outline-primary  btn-block" onclick="document.getElementById('inputCurriculum').click();" /> -->
+                                            </div>
+                                            <div class="col-md-6">
+                                                <a id="btnCurriculum" disabled type="button" class="btn btn-warning btn-block" style="color: #F5F5F5;" target="_blank"><i class="fas fa-eye"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Tarjeta datos institucionales-->
+                <div class="container-flex mb-3" id="wwg-accordian">
+                    <div class="card">
+                        <div class="card-header" id="datos-institucionales-heading" style="background-color: white;">      
+                            <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#datos-institucionales" style="cursor:pointer;"><i class="fas fa-school"></i>&nbsp;Datos institucionales</h5>
+                        </div>
+                        <div class="collapse show" id="datos-institucionales">
+                            <div class="card-text p-3">
+                                <div class="form-row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="area">Area disciplinar</label>
+                                        <select class="selectpicker" data-live-search="true" title="Seleccione..." data-width="100%" id="selectArea" onchange="seleccionaArea();">
+                                            <option value="1">Matemáticas y ciencias experimentales</option>
+                                            <option value="2">Ciencias sociales y humanidades</option>
+                                            <option value="3">Comunicación</option>
+                                        </select>
+                                        <input hidden type="text" class="form-control border border-ligth" id="areaDocente" name="areaDocente" placeholder="area" required >
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="nombreEscuela">Nombre de la institución</label>
+                                        <input type="text" class="form-control border border-ligth" id="nombreEscuela" name="nombreEscuela" placeholder="Nombre de la institución" required>
+                                        <div class="invalid-tooltip">
+                                            Introduzca el nombre
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="cct">CCT</label>
+                                        <input type="text" class="form-control border border-ligth" id="cct" name="cct" placeholder="CCT" required >
+                                        <div class="invalid-tooltip">
+                                            Introduzca el CCT
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-12 mb-3">
+                                        <div class="alert alert-warning" role="alert">
+                                            <div class="form-row">
+                                                <strong class="col-md-12">Campos para el inicio de sesión en la plataforma</strong>
+                                            </div>
+                                            <div class="form-row">
+                                                <div class="col-md-12 mb-3">
+                                                    <label for="password">Contraseña</label>
+                                                    <input type="text" class="form-control border border-ligth" id="contrasena" name="contrasena" placeholder="Contraseña" required  minlength="8">
+                                                </div>
+                                            </div>
+                                        </div>  
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <a class="btn btn-outline-success btn-block" onclick="confirmDialog()" style="cursor: pointer;">Guardar</a>
+                                    <button class="btn btn-outline-success btn-block" hidden type="submit" id="btnGuardar"></button></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <!--Tarjeta periodo-->
+            <!-- <div class="container-flex mb-3" id="wwg-accordian">
+                <div class="card">
+                    <div class="card-header" id="periodo-heading" style="background-color: white;">      
+                        <h5 data-toggle="collapse" data-parent="#wwg-accordian" href="#periodo" style="cursor:pointer;"><i class="far fa-clock"></i>&nbsp;Periodo</h5>
+                    </div>
+                    <div class="collapse hide" id="periodo">
+                        <div class="card-text p-3">
+                            <form class="needs-validation" novalidate>
+                                <div class="form-row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="validationTooltip07">Inicio</label>
+                                        <select name="selectInicio" id="validationTooltip04" class="form-control border border-ligth">
+                                            <option value="">Seleccionar...</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="validationTooltip08">Fin</label>
+                                        <select name="selectFin" id="validationTooltip04" class="form-control border border-ligth">
+                                            <option value="">Seleccionar...</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="validationTooltip09">Año</label>
+                                        <select name="selectAno" id="validationTooltip09" class="form-control border border-ligth">
+                                            <option value="">Seleccionar...</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <button class="btn btn-outline-success btn-block" type="submit">Guardar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+    </div>
+    <script>
+        //Funcion para cuando cambia de área 
+        function seleccionaArea(){
+            var x = document.getElementById('selectArea').value;
+            document.getElementById('areaDocente').value = x;
+        }
+
+        //Funcion para filtar a la tabla de docentes
+        function filtraDocente() {
+        // Declare variables 
+            var input, filter, table, tr, td, i;
+            input = document.getElementById("inputDocente");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("listaDocentes");
+            tr = table.getElementsByTagName("tr");
+
+            // Loop through all table rows, and hide those who don't match the search query
+            for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[0]; //La posición del arreglo indica el campo que se buscará
+                if (td) {
+                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                } 
+            }
+        }
+
+        //Funcin para cuando se selecciona un docente
+        function seleccionaDocente(idDocente, nombresDocente, apellidosDocente, edad, email, telFijo, telCelular, curp, rfc, areadisciplinar_docente, nombreEscuela, cct, domicilio, num_empleado, 
+        perfil_profesional, maximo_grado){
+            
+            inputs = document.getElementsByClassName('inputsCurriculum');
+            bandera = false;
+            for(var i = 0; i < inputs.length; i++){
+                urlCurriculum = inputs[i].value
+                idDocenteArchivo = inputs[i].value.slice(0, 1);
+                if(idDocente == idDocenteArchivo){
+                    //Si hay archivo y se puede ver
+                    bandera = true;
+                    urlCurriculum = urlCurriculum.substring(1, urlCurriculum.lenght);
+                    document.getElementById('btnCurriculum').className = 'btn btn-warning btn-block'
+                    document.getElementById('btnCurriculum').target = "_blank";
+                    document.getElementById('btnCurriculum').href = urlCurriculum;
+                    document.getElementById('btnCurriculum').style.cursor = 'pointer'
+                    document.getElementById('btnArchivo').disabled = true;
+                    document.getElementById('btnArchivo').className = 'btn btn-outline-secondary btn-block'
+                }
+                if(!bandera){
+                    //No hay un archivo y no se puede ver
+                    
+                    document.getElementById('btnCurriculum').href = '#';
+                    document.getElementById('btnCurriculum').removeAttribute('target');
+                    document.getElementById('btnCurriculum').className = 'btn btn-secondary btn-block'
+                    document.getElementById('btnCurriculum').style.cursor = 'default'
+                    document.getElementById('btnArchivo').disabled = false;
+                    document.getElementById('btnArchivo').className = 'btn btn-outline-primary btn-block'
+                    
+                }
+            }
+
+
+            //-------------------------------
+            var x = document.getElementsByClassName('inputDocente');
+            for(i = 0; i < x.length; i++) {
+                x[i].value = idDocente;
+            }
+            var idDocenteA = document.getElementById('idDocente');
+            idDocenteA.value = idDocente;
+
+            //Asignación a los inputs de los datos del alumno seleccionado
+            var nombresA = document.getElementById('nombresDocente');
+            var apellidosA = document.getElementById('apellidosDocente');
+            var edadA = document.getElementById('edad');
+            var emailA = document.getElementById('email');
+            var telFijoA = document.getElementById('telFijo');
+            var telCelularA = document.getElementById('telCelular');
+            var curpA = document.getElementById('curp');
+            var rfcA = document.getElementById('rfc');
+            var areadisciplinar_docenteA = document.getElementById('areaDocente');
+            var nombreEscuelaA = document.getElementById('nombreEscuela');
+            var cctA = document.getElementById('cct');
+            var domicilioA = document.getElementById('domicilio');
+            var num_empleadoA = document.getElementById('num_empleado');
+            var perfil_profesionalA = document.getElementById('perfil_profesional');
+            var maximo_gradoA = document.getElementById('maximo_grado');
+
+            nombresA.value = nombresDocente;
+            apellidosA.value = apellidosDocente;
+            edadA.value = edad;
+            emailA.value = email;
+            telFijoA.value = telFijo;
+            telCelularA.value = telCelular;
+            curpA.value = curp;
+            rfcA.value = rfc;
+            areadisciplinar_docenteA.value = areadisciplinar_docente;
+            nombreEscuelaA.value = nombreEscuela;
+            cctA.value = cct;
+            domicilioA.value = domicilio;
+            num_empleadoA.value = num_empleado;
+            perfil_profesionalA.value = perfil_profesional;
+            maximo_gradoA.value = maximo_grado;
+            $('#selectArea').selectpicker('val', areadisciplinar_docente);
+            
+            //Asignación a los labels del resumen del alumno
+            var nombresA_l = document.getElementById('l_nombre_docente');
+            var claveA_l = document.getElementById('l_clave');
+            var rfcA_l = document.getElementById('l_rfc');
+            var emailA_l = document.getElementById('l_email');
+            var num_celA_l = document.getElementById('l_num_cel');
+            var cctA_l = document.getElementById('l_cct');
+
+            nombresA_l.textContent = nombresDocente + ' ' + apellidosDocente;
+            claveA_l.textContent = num_empleado;
+            rfcA_l.textContent = rfc;
+            emailA_l.textContent = email;
+            num_celA_l.textContent = telCelular;
+            cctA_l.textContent = cct;
+            
+        }
+
+        //Alerta para confrimar acción de guardar
+        function confirmDialog(){
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: "Confirme si desea realizar la acción",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Confirmar'
+            }).then((result) => {
+                if (result.value) {
+                    document.getElementById('btnGuardar').click();
+                }
+                })
+        }
+
+        //Función al dar click al eliminar docente
+        function confirmDialogDelete(id){
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: "Confirme si desea realizar la acción",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Confirmar'
+            }).then((result) => {
+                if (result.value) {
+                    window.location.replace('delete-docente/'+id);
+                }
+                })
+        }
+
+    </script>
+{% endblock %}
